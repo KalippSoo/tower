@@ -1,0 +1,6 @@
+name: AnimeCraft
+version: '${project.version}'
+main: eu.animecraft.AnimeCraft
+api-version: '1.16'
+commands:
+  aa:

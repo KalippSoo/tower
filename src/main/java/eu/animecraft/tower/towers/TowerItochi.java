@@ -1,0 +1,31 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
+package eu.animecraft.tower.towers;
+
+import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.Rarity;
+
+import java.util.UUID;
+
+public class TowerItochi extends Tower {
+    public TowerItochi() {
+        super(0, Rarity.COMMON, "Itochi", null, false, 4, UUID.randomUUID(),
+                "ewogICJ0aW1lc3RhbXAiIDogMTY5MDAwMzQ4NjkyOSwKICAicHJvZmlsZUlkIiA6ICJiNzQ4YWExODk3ZGU0Y2RiYjFhNTI1YjVjMjM3ZDc2" +
+                        "MiIsCiAgInByb2ZpbGVOYW1lIiA6ICJUaXhpOCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6" +
+                        "IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS82YmJm" +
+                        "OTBhZGNjNDlhNGYzYWU0YTEyOWMxNDUzYTE3YTMwMGJjNzQwM2YyNjZlMDE4NmZhODY2ZjBkNDg4MDZjIgogICAgfQogIH0KfQ==",
+                "Z36SLh258+jHPP6w2+4twB55Xek8bUq5zf1WPUO+lnb9rUhpqj2Q6Z5zQtdNS0j0YJxFV+8nylhkY1QxlHCPnmaTrxshedFvaTDbY+7lH4Sd" +
+                        "kepGnNrdls+Snab8Nrd84n/wDEXptbh1wPgMOBn0RPILW1y+AFUKyw1C9gAj7RsK5l5xqIKlKIrtaa//A8GrZUqmyCR9GezhY+DG" +
+                        "N0MgPl3QU8KqZ/9ldBzu1Tbr07HJua0HNAFsSy364iooXLfhYb6DmUXQiOozxUgwJ90hsNtah7tsxDdFXrDEgTip73HtEqvnQnyY" +
+                        "4gxmSqjg0fl7SyIRZ0XHAf5lVCFW9qKlhLbC1/bRYyqaIXjUJNZgwHeS4gNmqHNGb8xv1kwtr36bOlsUzUQwD2BUkRiYfQlfXvMC" +
+                        "IBDSZhaVaKn9tJIV8OpR/y0ftauSXCdGbbgwxbvNhLeTd2yauy6AtR8sGbY0xJN6un1qkVezIugK1giPubhKM7JpjrJSn5FU2DoL" +
+                        "bzGlSgPvKrj1xxWOnHPbx9aIH1oMRaPrY3lOJQ0vI1m7+KVVBfS7CuNgo6kZJqoNayqP+wxgEFzXFibNGofZgstZed4XMFINpIju" +
+                        "8PtbMvWU57i57OdcvryiKgwjgcLJ2c/JVnkONUX5+a0QNW1gcoPDkIlwabXU67OrRSz38jtjvI0=", "", "");
+        this.damage = 48;
+        this.cooldown = 4521;
+        this.range = 10;
+    }
+}
