@@ -1,20 +1,17 @@
 package eu.animecraft.listerners.menu;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.tower.Tower;
-import org.bson.Document;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class TowerMenu extends Menu {
     public TowerMenu(boolean rerollMenu) {
@@ -69,6 +66,8 @@ public class TowerMenu extends Menu {
                 return;
             case PAPER:
                 break;
+		default:
+			break;
         }
         this.set(this.getPlayer());
     }
@@ -86,7 +85,7 @@ public class TowerMenu extends Menu {
             this.getInventory().setItem(35, Utils.createItem(Material.PAPER, 1, "&f&lSearch"));
             this.getInventory().setItem(44, Utils.createItem(Material.PLAYER_HEAD, 1, "&f&l???"));
         }
-        List<String> uuids = new ArrayList();
+        List<String> uuids = new ArrayList<>();
 
         //Get the uuid of the towers to track it
         for (String towersUUID : getData().getListSelected()){

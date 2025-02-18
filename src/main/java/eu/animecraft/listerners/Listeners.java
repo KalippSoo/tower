@@ -1,18 +1,10 @@
 package eu.animecraft.listerners;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
-import eu.animecraft.AnimeCraft;
-import eu.animecraft.data.Data;
-import eu.animecraft.data.DocumentRelated;
-import eu.animecraft.data.StatsReroll;
-import eu.animecraft.data.components.Menu;
-import eu.animecraft.data.components.Utils;
-import eu.animecraft.listerners.menu.BannerMenu;
-import eu.animecraft.listerners.menu.RerollMenu;
-import eu.animecraft.listerners.menu.TowerMenu;
-import eu.animecraft.tower.Tower;
-import eu.animecraft.tower.tools.Trait;
 import org.bson.Document;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +22,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+
+import eu.animecraft.AnimeCraft;
+import eu.animecraft.data.Data;
+import eu.animecraft.data.DocumentRelated;
+import eu.animecraft.data.StatsReroll;
+import eu.animecraft.data.components.Menu;
+import eu.animecraft.data.components.Utils;
+import eu.animecraft.listerners.menu.BannerMenu;
+import eu.animecraft.listerners.menu.TowerMenu;
+import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.Trait;
 
 public class Listeners implements Listener {
 
@@ -69,7 +72,7 @@ public class Listeners implements Listener {
         Document collection = DocumentRelated.getSpecificDocument(player, "collection");
         Document inventory = DocumentRelated.getSpecificDocument(player, "inventory");
 
-        Iterator towers = inventory.getList("contents", String.class).iterator();
+        Iterator<String> towers = inventory.getList("contents", String.class).iterator();
 
         while(towers.hasNext()){
             String[] info = ((String)towers.next()).split(",");
@@ -82,7 +85,7 @@ public class Listeners implements Listener {
                     b = Double.parseDouble(info[5]),
                     c = Double.parseDouble(info[6]);
             boolean shiny = Boolean.parseBoolean(info[7]);
-            Trait trait = Trait.getTrait(info[8]);
+            Trait trait = Trait.valueOf(info[8]);
             int level = Integer.parseInt(info[9]);
             double experience = Double.parseDouble(info[10]);
             UUID uuid = UUID.fromString(info[11]);

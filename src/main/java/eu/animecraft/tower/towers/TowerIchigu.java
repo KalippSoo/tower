@@ -1,6 +1,7 @@
 package eu.animecraft.tower.towers;
 
 import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class TowerIchigu extends Tower {
                         "lRgBBbd7qt1njBnE5h8BoU1TCgTRgxWyFj+v5bXO7W6Xs=");
         this.damage = 25;
         this.cooldown = 234;
-        this.range = 23;
+        this.range = 12;
+        this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.LIGHT};
     }
 }

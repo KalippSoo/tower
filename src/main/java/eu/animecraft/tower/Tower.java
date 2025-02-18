@@ -1,17 +1,18 @@
 package eu.animecraft.tower;
 
-import java.lang.reflect.Field;
-import java.text.DecimalFormat;
+import static eu.animecraft.data.components.Utils.format;
+import static eu.animecraft.data.components.Utils.sendMessages;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static eu.animecraft.data.components.Utils.*;
-import eu.animecraft.AnimeCraft;
-import eu.animecraft.data.Data;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
+
 import eu.animecraft.data.Lvl;
 import eu.animecraft.data.StatsReroll;
 import eu.animecraft.data.components.SkullCreator;
@@ -19,22 +20,9 @@ import eu.animecraft.data.components.Utils;
 import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 import eu.animecraft.tower.tools.Trait;
-import net.minecraft.server.v1_16_R3.Item;
-import net.minecraft.server.v1_16_R3.Items;
-import org.bson.Document;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftItem;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 public class Tower {
-
-    //private CraftTower craftTower;
-    private DamageType[] damageTypes;
+	
     private int count;
     private int maxCount;
     private Rarity rarity;
@@ -47,6 +35,8 @@ public class Tower {
     /*
     Just write manually the damage, cooldown and the range with the leveling system create a new instance.
      */
+    public Tower evo = null;
+    public DamageType[] damageTypes;
     public int damage, cooldown, range;
     public double fd, fc, fr;
     public StatsReroll statsReroll = new StatsReroll(0,0,0);
@@ -58,11 +48,6 @@ public class Tower {
     public String signature;
     public String sValue;
     public String sSignature;
-
-    public String toString(){
-        return "dmg:" + damage + " reload:" + cooldown + " range:" + range + " rarity:" + rarity.name() + " name:" + name + " id:" + id
-                + " shiny:"+shiny+" uuid:"+uuid.toString()+" value:"+value;
-    }
 
     public Tower(int id, Rarity rarity, String name, Player owner, boolean shiny, int maxCount, UUID uuid, String value, String signature, String sValue, String sSignature) {
         this.id = id;
@@ -84,18 +69,25 @@ public class Tower {
         return Utils.color("&7[" + lvlSystem.getCurrentLevel() + "] " + this.rarity.getColor() + this.name);
     }
 
+    public void newStats() {
+        statsReroll = new StatsReroll(ThreadLocalRandom.current().nextDouble(-10, 5), ThreadLocalRandom.current().nextDouble(-10, 5), ThreadLocalRandom.current().nextDouble(-10, 5));
+        updateStats();
+    }
+    
     public void updateStats(){
 
         double td = 0, tc = 0, tr = 0;
 
         switch (trait){
+        	case none: break;
             case FORCE: td = 15;break;
             case AGILITY: tc = -15;break;
             case VISION: tr = 15;break;
             case SKILLED: td = 10; tc = -10; tr = 10;break;
             case DEADLY: td = 5; tc = -25;break;
+            case QUICKLEANER: break;
             case STAR: td = 30; tc = -15; tr = 10;break;
-            case PARTICULAR: td = -15; tc = -45;break;
+            case PARTICULAR: td = -15; tc = -65;break;
             case UNIQUE: td = 400; tc = -25; tr = 20;break;
         }
 
@@ -136,13 +128,13 @@ public class Tower {
             }else{
                 updateStats();
                 meta.setDisplayName(Utils.color("&e[" + lvlSystem.getCurrentLevel() + "] " + this.rarity.getColor() + name));
-                lines.add(Utils.color("&7Damage: &c" + format.format(fd) + statsReroll.d(0)));
-                lines.add(Utils.color("&7Reload: &a" + format.format(fc / 20.0F) + "s"+ statsReroll.d(1)));
-                lines.add(Utils.color("&7Range: &e" + format.format(fr) + statsReroll.d(2)));
+                lines.add(Utils.color("&7Damage: &c" + format.format(fd) +" &f&l/"+ statsReroll.d(0)));
+                lines.add(Utils.color("&7Reload: &a" + format.format(fc / 20.0F) + "s "+" &f&l/"+ statsReroll.d(1)));
+                lines.add(Utils.color("&7Range: &e" + format.format(fr) +" &f&l/"+ statsReroll.d(2)));
                 if (trait != null && trait != Trait.none)
-                    lines.add(Utils.color("&7Trait: " +trait.name()));
+                    lines.add(Utils.color("&7Trait: "+trait.getRarity().getColor()+trait.name()));
             }
-
+            
             lines.add("");
             lines.add(Utils.color(this.getRarity().getName()));
             meta.setLore(lines);
@@ -217,7 +209,7 @@ public class Tower {
     public void setId(int id) {
         this.id = id;
     }
-
+    
     public boolean isShiny() {
         return this.shiny;
     }
@@ -225,12 +217,14 @@ public class Tower {
     public void setShiny(boolean shiny) {
         this.shiny = shiny;
         if (shiny) {
-            this.value = this.sValue;
-            this.signature = this.sSignature;
+        	if (sValue != null) {
+                this.value = this.sValue;
+                this.signature = this.sSignature;
+        	}
         }
 
     }
-
+    
     public String getDocumentCode() {
         return id+","+damage+","+cooldown+","+range+","+statsReroll.a+","+statsReroll.b+","+statsReroll.c+","+shiny+","+trait.name()+","+lvlSystem.getCurrentLevel()+","+lvlSystem.getCurrentExp()+","+uuid.toString();
     }

@@ -1,26 +1,34 @@
 package eu.animecraft.tower.tools;
 
+import java.awt.Color;
+
+import net.md_5.bungee.api.ChatColor;
+
 public enum Rarity {
-    COMMON("&a&lCOMMON TOWER", "&a"),
-    RARE("&9&lRARE TOWER", "&9"),
-    EPIC("&5&lEPIC TOWER", "&5"),
-    LEGENDARY("&6&lLEGENDARY TOWER", "&6"),
-    MYTHIC("&d&kO &r&d&lMythic TOWER &d&kO", "&d"),
-    LIMITED("&c&kOOO &r&c&lLIMITED TOWER &c&kOOO", "&c");
+    COMMON("COMMON TOWER", ChatColor.of(new Color(225, 225, 225))),
+    RARE("RARE TOWER", ChatColor.of(new Color(60, 255, 30))),
+    EPIC("EPIC TOWER", ChatColor.of(new Color(30, 185, 255))),
+    LEGENDARY("LEGENDARY TOWER", ChatColor.of(new Color(255, 215, 60))),
+    MYTHIC("MYTHIC TOWER", ChatColor.of(new Color(245, 120, 235))),
+    LIMITED("LIMITED TOWER", ChatColor.of(new Color(235, 65, 65)));
 
     private String name;
-    private String color;
+    private ChatColor color;
 
-    private Rarity(String name, String color) {
+    private Rarity(String name, ChatColor color) {
         this.name = name;
         this.color = color;
     }
 
     public String getName() {
+        return getColor()+"&l"+this.name;
+    }
+    
+    public String getRawName() {
         return this.name;
     }
 
-    public String getColor() {
+    public ChatColor getColor() {
         return this.color;
     }
 }

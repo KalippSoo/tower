@@ -1,11 +1,7 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package eu.animecraft.tower.towers;
 
 import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 
 import java.util.UUID;
@@ -24,8 +20,9 @@ public class TowerItochi extends Tower {
                         "IBDSZhaVaKn9tJIV8OpR/y0ftauSXCdGbbgwxbvNhLeTd2yauy6AtR8sGbY0xJN6un1qkVezIugK1giPubhKM7JpjrJSn5FU2DoL" +
                         "bzGlSgPvKrj1xxWOnHPbx9aIH1oMRaPrY3lOJQ0vI1m7+KVVBfS7CuNgo6kZJqoNayqP+wxgEFzXFibNGofZgstZed4XMFINpIju" +
                         "8PtbMvWU57i57OdcvryiKgwjgcLJ2c/JVnkONUX5+a0QNW1gcoPDkIlwabXU67OrRSz38jtjvI0=", "", "");
-        this.damage = 48;
-        this.cooldown = 4521;
+        this.damage = 24;
+        this.cooldown = 250;
         this.range = 10;
+        this.damageTypes = new DamageType[]{DamageType.MAGICAL, DamageType.FIRE};
     }
 }

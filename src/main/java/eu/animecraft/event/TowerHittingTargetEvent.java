@@ -1,21 +1,19 @@
 package eu.animecraft.event;
 
-import eu.animecraft.tower.CraftTower;
-import net.minecraft.server.v1_16_R3.EntityLiving;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import net.minecraft.server.v1_16_R3.EntityLiving;
 
 public class TowerHittingTargetEvent extends Event implements Cancellable {
 
 	private static HandlerList HANDLERS = new HandlerList();
 	boolean cancelled = false;
 
-	public CraftTower craftTower;
 	public EntityLiving entityLiving;
 
-	public TowerHittingTargetEvent(CraftTower craftTower, EntityLiving living){
-		this.craftTower = craftTower;
+	public TowerHittingTargetEvent(EntityLiving living){
 		this.entityLiving = living;
 	}
 

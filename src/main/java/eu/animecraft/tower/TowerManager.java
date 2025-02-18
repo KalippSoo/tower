@@ -3,43 +3,40 @@ package eu.animecraft.tower;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.bukkit.inventory.ItemStack;
 
 import eu.animecraft.data.Data;
 import eu.animecraft.tower.towers.TowerIchigu;
 import eu.animecraft.tower.towers.TowerItochi;
 import eu.animecraft.tower.towers.TowerSonGoku;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import eu.animecraft.tower.towers.Nami.TowerNami;
+import eu.animecraft.tower.towers.Nami.TowerNamiClimaStick;
 
 public class TowerManager {
     public List<Tower> availableTower = new ArrayList<>();
     public List<Tower> currentBanner = new ArrayList<>();
 
     public TowerManager() {
-        this.availableTower.add(new TowerItochi());
+    	this.availableTower.add(new TowerItochi());
         this.availableTower.add(new TowerSonGoku());
         this.availableTower.add(new TowerIchigu());
-
-        for(int i = 0; i < 5; ++i) {
-            this.currentBanner.add(this.availableTower.get(ThreadLocalRandom.current().nextInt(this.availableTower.size())));
+        this.availableTower.add(new TowerNami());
+        this.availableTower.add(new TowerNamiClimaStick());
+        
+        for(int i = 0; i < 5; i++) {
+        	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
+            this.currentBanner.add(availableTower.get(random));
         }
 
     }
 
     public Tower buyTower() {
         Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
-        if (Math.random() * 101.0 < 1.0) {
+        if (Math.random() * 101.0 <= 1.0) {
             tower.setShiny(true);
         }
-
-        tower.statsReroll.a = ThreadLocalRandom.current().nextDouble(-10, 5);
-        tower.statsReroll.b = ThreadLocalRandom.current().nextDouble(-10, 5);
-        tower.statsReroll.c = ThreadLocalRandom.current().nextDouble(-10, 5);
-        tower.updateStats();
-        ;
-
         return tower;
     }
 

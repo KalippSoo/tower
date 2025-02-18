@@ -1,11 +1,18 @@
 package eu.animecraft.tower.tools;
 
 public enum DamageType {
-    ALL(0),
-    FIRE(1),
-    ICE(2),
-    WIND(3);
+	
+	//Base
+	PHYSICAL,
+	MAGICAL,
+	
+	//Aditional
+	LIGHT,
+	DARK,
+	WIND,
+	WATER,
+	FIRE,
+	NATURE,
+	;
 
-    private DamageType(int id) {
-    }
 }

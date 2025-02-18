@@ -3,32 +3,32 @@ package eu.animecraft.tower.tools;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum Trait {
-    none(0, -1, -1),
-    FORCE(3, 0, 30),
-    AGILITY(3, 1, 30),
-    VISION(3, 2, 30),
-    SKILLED(2, 3, 10),
-    DEADLY(2, 5, 0.5),
-    STAR(2, 5, 0.4),
-    PARTICULAR(2, 5, 0.25),
-    UNIQUE(1, 6, 0.1),
+    UNIQUE(6, Rarity.MYTHIC),
+    PARTICULAR(7, Rarity.MYTHIC),
+    STAR(8, Rarity.MYTHIC),
+    DEADLY(9, Rarity.LEGENDARY),
+    SKILLED(10, Rarity.LEGENDARY),
+    QUICKLEANER(15, Rarity.LEGENDARY),
+    VISION(30, Rarity.EPIC),
+    AGILITY(30, Rarity.EPIC),
+    FORCE(30, Rarity.EPIC),
+    none(-1, Rarity.EPIC),
     ;
-
-    private int level;
-    private int id;
+	
     private double chance;
+    private Rarity rarity;
 
-    Trait(int level, int id, double chance){
-        this.level = level;
-        this.id = id;
+    Trait(double chance, Rarity rarity){
         this.chance = chance;
+        this.rarity = rarity;
     }
     public static Trait getTraitResult(){
 
-        double random = Math.random() * 101, previous = 0;
-        Trait t = Trait.none;
+        double random = Math.random() * (getChances()+1), previous = 0;
+        Trait t = Trait.FORCE;
 
         for (Trait trait : values()){
+        	if (trait == none)continue;
             previous += trait.chance;
             if (random <= previous){
                 t = trait;
@@ -36,7 +36,7 @@ public enum Trait {
             }
         }
 
-        if (t.level == 3 && t.chance == 30 || t == Trait.none){
+        if (t.chance == 30){
             int i = ThreadLocalRandom.current().nextInt(3);
             switch (i){
                 case 0: t = Trait.FORCE; break;
@@ -48,6 +48,7 @@ public enum Trait {
         return t;
 
     }
+    
     public static double getChances(){
         double d = 0;
         for (Trait trait : values()){
@@ -55,9 +56,7 @@ public enum Trait {
         }
         return d;
     }
-    public int getLevel(){
-        return this.level;
-    }
+    
     public static Trait getTrait(String name){
         for (Trait trait : values()){
             if (trait.name() == name)
@@ -65,5 +64,9 @@ public enum Trait {
         }
         return null;
     }
+    
+	public Rarity getRarity() {
+		return rarity;
+	}
 
 }

@@ -50,7 +50,8 @@ public class BannerMenu extends Menu {
 
                 for(int i = 0; i < item.getAmount(); ++i) {
                     Tower tower = this.instance.getTowerManager().buyTower();
-                    builder.append(tower.displayName() + " : &e(DPS " + tower.damage / (float)(tower.cooldown/20) + ")\n");
+                    tower.newStats();
+                    builder.append(tower.displayName() + " : &e(DPS " + (Utils.format.format((tower.fc/ (tower.fc/20))) + ")\n"));
                     getData().getTowers().add(tower);
                     if (tower.getRarity() != Rarity.MYTHIC && tower.getRarity() != Rarity.LIMITED)continue;
                 }
@@ -76,7 +77,7 @@ public class BannerMenu extends Menu {
         }
 
         for(i = 0; i < this.towerLocation.length; ++i) {
-            this.getInventory().setItem(this.towerLocation[i], AnimeCraft.instance.getTowerManager().availableTower.get(ThreadLocalRandom.current().nextInt(3)).getItemVersion(1));
+            this.getInventory().setItem(this.towerLocation[i], AnimeCraft.instance.getTowerManager().availableTower.get(ThreadLocalRandom.current().nextInt(AnimeCraft.instance.getTowerManager().availableTower.size())).getItemVersion(1));
         }
 
         this.getInventory().setItem(16, Utils.createItem(Material.LAPIS_LAZULI, 1, "&9Gems: &d" + this.instance.getDataManager().getPlayerData().get(this.getPlayer().getUniqueId()).gems));

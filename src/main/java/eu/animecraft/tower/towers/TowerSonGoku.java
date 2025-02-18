@@ -1,6 +1,7 @@
 package eu.animecraft.tower.towers;
 
 import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 
 import java.util.UUID;
@@ -35,8 +36,9 @@ public class TowerSonGoku extends Tower {
                         "/2+/F5m+Z/rmN7ElR4tQm1iAc9y0AZVYXKX0FexEwPn//S+Iyu4TwpsG3TdRPTIgGMeRgpTmyTyrS5he5bmT3f4u" +
                         "Cco5Ff2mdHnHPEpIY+fEG045zhGn/wdSTHueS3Tvz2+HizNinCHqE1+b79Vn5TDANGmjn8ULZ104zpN6Duu1xPBag" +
                         "R0iSBIWIBeSKnnvA9nFXr5EwPCFGC/mWbX2Dhx4ik1UYJegQuv5+/l7yjU=");
-        this.damage = 12;
+        this.damage = 18;
         this.cooldown = 142;
-        this.range = 8;
+        this.range = 15;
+        this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.LIGHT};
     }
 }

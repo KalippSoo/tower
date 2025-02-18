@@ -37,11 +37,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 public class Utils {
     public static String moneySymbol = "❇";
     public static String creditSymbol = "Ⓒ";
-
+    
     public static DecimalFormat format = new DecimalFormat("###,###.##");
-
-    public Utils() {
-    }
 
     public static String color(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
@@ -53,8 +50,8 @@ public class Utils {
     }
 
     public static List<String> color(List<String> texts) {
-        List<String> lines = new ArrayList();
-        Iterator var3 = texts.iterator();
+        List<String> lines = new ArrayList<>();
+        Iterator<?> var3 = texts.iterator();
 
         while(var3.hasNext()) {
             String text = (String)var3.next();
@@ -103,7 +100,7 @@ public class Utils {
     }
 
     public static void sendGlobalMessages(String... texts) {
-        Iterator var2 = Bukkit.getOnlinePlayers().iterator();
+        Iterator<?> var2 = Bukkit.getOnlinePlayers().iterator();
 
         while(var2.hasNext()) {
             Player players = (Player)var2.next();
@@ -167,7 +164,7 @@ public class Utils {
             meta.setDisplayName(color(name));
         }
 
-        ArrayList<String> lines = new ArrayList();
+        ArrayList<String> lines = new ArrayList<>();
         String[] var10 = lores;
         int var9 = lores.length;
 
@@ -190,8 +187,8 @@ public class Utils {
         }
 
         if (lores != null) {
-            ArrayList<String> lines = new ArrayList();
-            Iterator var8 = lores.iterator();
+            ArrayList<String> lines = new ArrayList<>();
+            Iterator<?> var8 = lores.iterator();
 
             while(var8.hasNext()) {
                 String line = (String)var8.next();
@@ -213,7 +210,7 @@ public class Utils {
             meta.setDisplayName(color(name));
         }
 
-        ArrayList<String> lines = new ArrayList();
+        ArrayList<String> lines = new ArrayList<>();
         String[] var11 = lores;
         int var10 = lores.length;
 
@@ -230,7 +227,7 @@ public class Utils {
     public static ItemStack copy(ItemStack itemStack, String... lores) {
         ItemStack item = itemStack.clone();
         ItemMeta meta = item.getItemMeta();
-        ArrayList<String> lines = new ArrayList();
+        ArrayList<String> lines = new ArrayList<>();
         String[] var8 = lores;
         int lvl = lores.length;
 
@@ -239,7 +236,7 @@ public class Utils {
             lines.add(color(line));
         }
 
-        Iterator var10 = meta.getEnchants().keySet().iterator();
+        Iterator<?> var10 = meta.getEnchants().keySet().iterator();
 
         while(var10.hasNext()) {
             Enchantment enchantment = (Enchantment)var10.next();
@@ -255,9 +252,9 @@ public class Utils {
     public static ItemStack Enchant(Enchantment enchantment, int lvl, ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
         meta.addEnchant(enchantment, lvl, true);
-        List<String> list = new ArrayList();
+        List<String> list = new ArrayList<>();
         if (meta.hasLore()) {
-            Iterator var7 = meta.getLore().iterator();
+            Iterator<?> var7 = meta.getLore().iterator();
 
             while(var7.hasNext()) {
                 String lines = (String)var7.next();
@@ -276,13 +273,13 @@ public class Utils {
     public static ItemStack Enchant(Enchantment enchantment, int lvl, ItemStack itemStack, boolean b) {
         ItemMeta meta = itemStack.getItemMeta();
         meta.addEnchant(enchantment, lvl, true);
-        List<String> list = new ArrayList();
+        List<String> list = new ArrayList<>();
         if (b) {
             meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ENCHANTS});
         }
 
         if (meta.hasLore()) {
-            Iterator var8 = meta.getLore().iterator();
+            Iterator<?> var8 = meta.getLore().iterator();
 
             while(var8.hasNext()) {
                 String lines = (String)var8.next();
