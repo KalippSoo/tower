@@ -22,6 +22,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+@SuppressWarnings("deprecation")
 public class SkullCreator {
     private static boolean warningPosted = false;
     private static Field blockProfileField;

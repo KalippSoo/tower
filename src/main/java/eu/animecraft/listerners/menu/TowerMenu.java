@@ -19,14 +19,14 @@ public class TowerMenu extends Menu {
     }
 
     public String name() {
-        return "Tower";
+        return getPlayer().getName()+"'s tower";
     }
 
     public int size() {
         return 54;
     }
 
-    boolean rerollMenu;
+    public boolean rerollMenu;
     int preset = 1;
     int searchMode = -1;
 
@@ -83,7 +83,7 @@ public class TowerMenu extends Menu {
             this.getInventory().setItem(17, Utils.createItem(Material.RED_DYE, 1, "&4&lUnequip all"));
             this.getInventory().setItem(26, Utils.createItem(Material.GOLD_INGOT, 1, "&c&lSell"));
             this.getInventory().setItem(35, Utils.createItem(Material.PAPER, 1, "&f&lSearch"));
-            this.getInventory().setItem(44, Utils.createItem(Material.PLAYER_HEAD, 1, "&f&l???"));
+            this.getInventory().setItem(44, Utils.createItem(Material.POLISHED_ANDESITE_STAIRS, 1, "&f&l???"));
         }
         List<String> uuids = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class TowerMenu extends Menu {
                 uuids.add(towersUUID);
                 ItemStack stack = towers.getItemVersion(0);
                 ItemMeta meta = stack.getItemMeta();
-                meta.setDisplayName(Utils.color(meta.getDisplayName() + " &7&lSELECTED"));
+                meta.setDisplayName(Utils.color(meta.getDisplayName()));
                 List<String> lines = new ArrayList<>(meta.getLore());
                 lines.add(Utils.color(""));
                 lines.add(Utils.color("&cLeft click to unselected !"));

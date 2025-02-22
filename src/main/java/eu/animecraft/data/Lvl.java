@@ -12,7 +12,9 @@ public class Lvl {
     int maxLevel = 50;
     int currentLevel = 1;
     double currentExp = 0.0;
-    double pourcentage = 2.2;
+    //Gain after each lvl
+    double pourcentage = 5.6;
+    
     double[] levelingUp = new double[]{
             2050.0, 8050.0, 18050.0, 32050.0, 50050.0, 72050.0, 98050.0, 128100.0, 162100.0, 200100.0, 242100.0, 288100.0,
             338100.0, 392100.0, 450100.0, 512100.0, 578100.0, 648100.0, 722100.0, 800100.0, 882100.0, 968100.0, 1058000.0,

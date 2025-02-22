@@ -7,6 +7,7 @@ import eu.animecraft.data.DataManager;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.group.GroupManager;
 import eu.animecraft.listerners.Listeners;
+import eu.animecraft.listerners.TowerListener;
 import eu.animecraft.tower.TowerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -36,12 +37,14 @@ public class AnimeCraft extends JavaPlugin {
     public static MongoCollection<Document> profiles = mongoDatabase.getCollection("profiles");
 
     public void onEnable() {
+        instance = this;
         this.groups = new ConfigManager(this, "", "", "groups.yml");
         this.towerManager = new TowerManager();
         this.groupManager = new GroupManager(this);
         this.dataManager = new DataManager();
-        instance = this;
+        
         Bukkit.getServer().getPluginManager().registerEvents(new Listeners(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new TowerListener(), this);
 
         try {
             Field maxStackSizeField = Item.class.getDeclaredField("maxStackSize");

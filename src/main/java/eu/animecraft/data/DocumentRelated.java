@@ -21,6 +21,7 @@ public class DocumentRelated {
         int gold = 0;
         int experience = 0;
         int level = 1;
+        int rerolls = 0;
         String title = "";
 
         Document stats, quests, menu, collection, inventory, banner, classic, event, profile;
@@ -42,6 +43,7 @@ public class DocumentRelated {
             stats.append("title", null);
             stats.append("gems", gems);
             stats.append("gold", 0);
+            stats.append("reroll", 0);
             stats.append("rank", "player");
 
             collection.append("size", 200);
@@ -88,6 +90,7 @@ public class DocumentRelated {
             list = menu.getList("selection", String.class);
             inventorySize = inventory.getInteger("size");
             title = stats.getString("title");
+            rerolls = stats.getInteger("reroll");
         }
 
         data.gems = gems;
@@ -95,6 +98,7 @@ public class DocumentRelated {
         data.gold = gold;
         data.level = level;
         data.title = title;
+        data.rerolls = rerolls;
 
         data.setListSelected(list);
         data.setMaxStorageSize(inventorySize);
@@ -121,6 +125,7 @@ public class DocumentRelated {
         stats.append("title", data.title);
         stats.append("gems", data.gems);
         stats.append("gold", data.gold);
+        stats.append("reroll", data.rerolls);
         stats.append("rank", data.getGroup().getGroup() == null ? "player" : data.getGroup().getGroup());
 
         collection.append("size", 200);

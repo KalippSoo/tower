@@ -5,18 +5,19 @@
 
 package eu.animecraft.data.components;
 
-import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
-import eu.animecraft.AnimeCraft;
-import eu.animecraft.data.Data;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -34,12 +35,30 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
+import com.google.gson.JsonParser;
+
+import eu.animecraft.AnimeCraft;
+import eu.animecraft.data.Data;
+import net.md_5.bungee.api.ChatColor;
+
 public class Utils {
     public static String moneySymbol = "❇";
     public static String creditSymbol = "Ⓒ";
     
-    public static DecimalFormat format = new DecimalFormat("###,###.##");
-
+    public static String format(double amount) {
+    	
+    	NumberFormat nf = NumberFormat.getNumberInstance(Locale.FRANCE);
+    	DecimalFormat df = (DecimalFormat)nf;
+    	df.applyPattern("###,###.##");
+    	return df.format(amount).replace(".", " ");
+    }
+    
+    public static double round(double amount) {
+    	int power = 10^2;
+    	return Math.floor(amount * power) /100;
+    	
+    }
+    
     public static String color(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
@@ -421,7 +440,7 @@ public class Utils {
     }
 
     public static List<Block> get3x3Blocks(Location loc, String pattern) {
-        List<Block> blocks = new ArrayList();
+        List<Block> blocks = new ArrayList<>();
         blocks.add(loc.getBlock());
         if (pattern.toUpperCase() == "X") {
             blocks.add(loc.add(0.0, 1.0, 0.0).getBlock());
@@ -473,7 +492,7 @@ public class Utils {
             meta.setDisplayName(color(name));
         }
 
-        List<String> lore = new ArrayList();
+        List<String> lore = new ArrayList<>();
         String[] var9 = strings;
         int var8 = strings.length;
 
@@ -513,7 +532,7 @@ public class Utils {
     public static List<ItemStack> checkItems(Player player, Object[] items) {
         int lenght = items.length;
         Inventory inventory = player.getInventory();
-        List<ItemStack> itemStored = new ArrayList();
+        List<ItemStack> itemStored = new ArrayList<>();
 
         for(int i = 0; i < lenght; ++i) {
             if (items[i] instanceof ItemStack) {
@@ -532,7 +551,7 @@ public class Utils {
     }
 
     public static List<?> addToExistingList(List<?> list) {
-        List<?> List = new ArrayList();
+        List<?> List = new ArrayList<>();
         return List;
     }
 

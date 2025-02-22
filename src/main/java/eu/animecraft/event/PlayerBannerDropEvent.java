@@ -1,29 +1,28 @@
 package eu.animecraft.event;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.Utils;
-import eu.animecraft.tower.Tower;
 
-public class TowerPlaceEvent extends Event{
+public class PlayerBannerDropEvent extends Event implements Cancellable{
 
 	private static HandlerList HANDLERS = new HandlerList();
 	
 	private Player player;
 	private Data data;
 	
-	private Location location;
-	private Tower tower;
+	private int bannerID;
 	
-	public TowerPlaceEvent(Player player, Tower tower, Location loc) {
+	boolean cancelled = false;
+	
+	public PlayerBannerDropEvent(Player player, int id) {
 		this.player = player;
 		this.data = Utils.getData(player);
-		this.tower = tower;
-		this.location = loc;
+		this.bannerID = id;
 	}
 
 	@Override
@@ -41,15 +40,24 @@ public class TowerPlaceEvent extends Event{
 		return player;
 	}
 
+	@Override
+	public boolean isCancelled() {
+		// TODO Auto-generated method stub
+		return cancelled;
+	}
+
+	@Override
+	public void setCancelled(boolean arg0) {
+		cancelled = arg0;
+		
+	}
+
+	public int getBannerID() {
+		return bannerID;
+	}
+
 	public Data getData() {
 		return data;
 	}
-
-	public Tower getTower() {
-		return tower.clone();
-	}
-
-	public Location getLocation() {
-		return location;
-	}
+	
 }

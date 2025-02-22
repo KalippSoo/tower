@@ -13,6 +13,7 @@ C:\Users\bouch\git\tower\src\main\java\eu\animecraft\commands\ManagerCommand.jav
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\StatsReroll.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\towers\TowerSonGoku.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\tools\Rarity.java
+C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\components\EventListener.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\AnimeCraft.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\towers\Nami\TowerNamiClimaStick.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\Data.java
@@ -33,9 +34,11 @@ C:\Users\bouch\git\tower\src\main\java\eu\animecraft\event\TowerChangeMechanicEv
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\DataManager.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\event\TowerStunEvent.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\towers\Nami\TowerNami.java
+C:\Users\bouch\git\tower\src\main\java\eu\animecraft\event\PlayerBannerDropEvent.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\tools\DamageType.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\event\TowerAbilityEvent.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\components\Utils.java
+C:\Users\bouch\git\tower\src\main\java\eu\animecraft\listerners\TowerListener.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\components\ISCommands.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\data\ResistanceType.java
 C:\Users\bouch\git\tower\src\main\java\eu\animecraft\tower\tools\Trait.java

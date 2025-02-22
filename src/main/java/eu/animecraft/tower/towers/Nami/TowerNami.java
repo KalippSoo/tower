@@ -9,7 +9,7 @@ import eu.animecraft.tower.tools.Rarity;
 public class TowerNami extends Tower{
 
 	public TowerNami() {
-		super(4574, Rarity.EPIC, "Nomy (Weather Stick)", null, false, 4, UUID.randomUUID(), 
+		super(4574, Rarity.EPIC, "Nomy (Stick)", null, false, 4, UUID.randomUUID(), 
 				"ewogICJ0aW1lc3RhbXAiIDogMTY3MTk1MzcxODE0OCwKICAicHJvZmlsZUlkIiA6ICJhMjk1OD"
 				+ "ZmYmU1ZDk0Nzk2OWZjOGQ4ZGE0NzlhNDNlZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJMZXZlMj"
 				+ "MiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgIC"

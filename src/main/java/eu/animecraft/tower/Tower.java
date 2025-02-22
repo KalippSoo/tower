@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -17,6 +20,7 @@ import eu.animecraft.data.Lvl;
 import eu.animecraft.data.StatsReroll;
 import eu.animecraft.data.components.SkullCreator;
 import eu.animecraft.data.components.Utils;
+import eu.animecraft.event.TowerPlaceEvent;
 import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 import eu.animecraft.tower.tools.Trait;
@@ -31,7 +35,7 @@ public class Tower {
     private Trait trait = Trait.none;
     private int id;
     private boolean shiny;
-
+    public ArmorStand stand;
     /*
     Just write manually the damage, cooldown and the range with the leveling system create a new instance.
      */
@@ -42,7 +46,10 @@ public class Tower {
     public StatsReroll statsReroll = new StatsReroll(0,0,0);
     public Lvl lvlSystem = new Lvl(this);
     public UUID uuid;
-
+    
+    //Atacking parameters
+    public int currentCooldown = 0;
+    
     //Skin
     public String value;
     public String signature;
@@ -75,7 +82,7 @@ public class Tower {
     }
     
     public void updateStats(){
-
+    	
         double td = 0, tc = 0, tr = 0;
 
         switch (trait){
@@ -91,7 +98,7 @@ public class Tower {
             case UNIQUE: td = 400; tc = -25; tr = 20;break;
         }
 
-        double bd = (damage + statsReroll.a), bc = (cooldown + statsReroll.b), br = (range + statsReroll.c);
+        double bd = (lvlSystem.getDamage() + statsReroll.a), bc = (cooldown + statsReroll.b), br = (range + statsReroll.c);
         this.fd = (bd + ((bd*td)/100)) + (shiny ? ((damage*15)/100) : 0);
         this.fc = (bc + ((bc*tc)/100)) - (shiny ? ((cooldown*10)/100) : 0);
         this.fr = (br + ((br*tr)/100)) + (shiny ? ((range*5)/100) : 0);
@@ -104,6 +111,9 @@ public class Tower {
         tower.cooldown = cooldown;
         tower.range = range;
         tower.statsReroll = statsReroll;
+        tower.fd = fd;
+        tower.fc = fc;
+        tower.fr = fr;
         return tower;
 
     }
@@ -126,11 +136,10 @@ public class Tower {
                 meta.setDisplayName(Utils.color(this.rarity.getColor() + name));
 
             }else{
-                updateStats();
                 meta.setDisplayName(Utils.color("&e[" + lvlSystem.getCurrentLevel() + "] " + this.rarity.getColor() + name));
-                lines.add(Utils.color("&7Damage: &c" + format.format(fd) +" &f&l/"+ statsReroll.d(0)));
-                lines.add(Utils.color("&7Reload: &a" + format.format(fc / 20.0F) + "s "+" &f&l/"+ statsReroll.d(1)));
-                lines.add(Utils.color("&7Range: &e" + format.format(fr) +" &f&l/"+ statsReroll.d(2)));
+                lines.add(Utils.color("&7Damage: &c" + Math.round(fd) +" &f&l/"+ statsReroll.d(0)));
+                lines.add(Utils.color("&7Reload: &a" + format(fc / 20.0F) + "s "+" &f&l/"+ statsReroll.d(1)));
+                lines.add(Utils.color("&7Range: &e" + format(fr) +" &f&l/"+ statsReroll.d(2)));
                 if (trait != null && trait != Trait.none)
                     lines.add(Utils.color("&7Trait: "+trait.getRarity().getColor()+trait.name()));
             }
@@ -143,6 +152,10 @@ public class Tower {
         }
     }
 
+    public void placeStand(Player player, Location loc) {
+    	Bukkit.getPluginManager().callEvent(new TowerPlaceEvent(player, this, loc));
+    }
+    
     public int getCount() {
         return this.count;
     }
@@ -217,7 +230,7 @@ public class Tower {
     public void setShiny(boolean shiny) {
         this.shiny = shiny;
         if (shiny) {
-        	if (sValue != null) {
+        	if (sValue != null || sValue.equals("")) {
                 this.value = this.sValue;
                 this.signature = this.sSignature;
         	}
@@ -226,6 +239,6 @@ public class Tower {
     }
     
     public String getDocumentCode() {
-        return id+","+damage+","+cooldown+","+range+","+statsReroll.a+","+statsReroll.b+","+statsReroll.c+","+shiny+","+trait.name()+","+lvlSystem.getCurrentLevel()+","+lvlSystem.getCurrentExp()+","+uuid.toString();
+        return id+","+statsReroll.a+","+statsReroll.b+","+statsReroll.c+","+shiny+","+trait.name()+","+lvlSystem.getCurrentLevel()+","+lvlSystem.getCurrentExp()+","+uuid.toString();
     }
 }

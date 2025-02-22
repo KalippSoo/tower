@@ -39,7 +39,7 @@ public class RerollMenu extends Menu {
                     Trait newTrait = Trait.getTraitResult();
                     tower.setTrait(newTrait);
                     getInventory().setItem(13, tower.getItemVersion(2));
-                    getInventory().setItem(31, Utils.createItem(Material.GREEN_CONCRETE, 1, "&fCurrent: "+tower.getTrait().getRarity().getColor()+tower.getTrait().name().toUpperCase(), "&fYou can reroll 24 times !"));
+                    getInventory().setItem(31, Utils.createItem(Material.GREEN_CONCRETE, 1, "&fCurrent: "+tower.getTrait().getRarity().getColor()+tower.getTrait().name().toUpperCase(), "&fYou can reroll " + getData().rerolls + " times !"));
                     break;
                 case BARRIER:
                     TowerMenu menu = new TowerMenu(true);
@@ -57,7 +57,7 @@ public class RerollMenu extends Menu {
     public void setMenuItems() {
         //Center 13
         getInventory().setItem(13, tower.getItemVersion(2));
-        getInventory().setItem(31, Utils.createItem(Material.GREEN_CONCRETE, 1, "&fCurrent: "+tower.getTrait().getRarity().getColor()+tower.getTrait().name().toUpperCase(), "&fYou can reroll 24 times !"));
+        getInventory().setItem(31, Utils.createItem(Material.GREEN_CONCRETE, 1, "&fCurrent: "+tower.getTrait().getRarity().getColor()+tower.getTrait().name().toUpperCase(), "&fYou can reroll " + getData().rerolls + " times !"));
 
         for (Trait trait : Trait.values()) {
         	if (trait.name().equals("none"))continue;

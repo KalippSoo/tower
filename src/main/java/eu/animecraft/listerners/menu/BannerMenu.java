@@ -2,15 +2,16 @@ package eu.animecraft.listerners.menu;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import eu.animecraft.AnimeCraft;
-import eu.animecraft.data.components.Menu;
-import eu.animecraft.data.components.Utils;
-import eu.animecraft.tower.Tower;
-import eu.animecraft.tower.tools.Rarity;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import eu.animecraft.AnimeCraft;
+import eu.animecraft.data.components.Menu;
+import eu.animecraft.data.components.Utils;
+import eu.animecraft.event.PlayerBannerDropEvent;
 
 public class BannerMenu extends Menu {
     int[] towerLocation = new int[]{12, 13, 14, 21, 22, 23};
@@ -46,17 +47,14 @@ public class BannerMenu extends Menu {
                     return;
                 }
 
-                StringBuilder builder = new StringBuilder();
-
                 for(int i = 0; i < item.getAmount(); ++i) {
-                    Tower tower = this.instance.getTowerManager().buyTower();
-                    tower.newStats();
-                    builder.append(tower.displayName() + " : &e(DPS " + (Utils.format.format((tower.fc/ (tower.fc/20))) + ")\n"));
-                    getData().getTowers().add(tower);
-                    if (tower.getRarity() != Rarity.MYTHIC && tower.getRarity() != Rarity.LIMITED)continue;
+                	
+                	PlayerBannerDropEvent event = new PlayerBannerDropEvent(player, 0);
+                	if (!event.isCancelled()) {
+                		Bukkit.getPluginManager().callEvent(event);
+                	}
                 }
-
-                Utils.sendMessages(player, new String[]{builder.toString()});
+                
 		default:
 			break;
         }

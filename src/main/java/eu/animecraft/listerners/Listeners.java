@@ -8,11 +8,14 @@ import java.util.UUID;
 import org.bson.Document;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -27,14 +30,14 @@ import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.DocumentRelated;
 import eu.animecraft.data.StatsReroll;
+import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.listerners.menu.BannerMenu;
-import eu.animecraft.listerners.menu.TowerMenu;
 import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.Trait;
 
-public class Listeners implements Listener {
+public class Listeners extends EventListener {
 
     public void circle(Location loc, int radius) {
         for(int x = loc.getBlockX() - radius; x < loc.getBlockX() + radius; ++x) {
@@ -69,7 +72,6 @@ public class Listeners implements Listener {
         }
 
         Document stats = DocumentRelated.getSpecificDocument(player, "stats");
-        Document collection = DocumentRelated.getSpecificDocument(player, "collection");
         Document inventory = DocumentRelated.getSpecificDocument(player, "inventory");
 
         Iterator<String> towers = inventory.getList("contents", String.class).iterator();
@@ -77,25 +79,23 @@ public class Listeners implements Listener {
         while(towers.hasNext()){
             String[] info = ((String)towers.next()).split(",");
             int id = Integer.parseInt(info[0]);
-            double damage = Double.parseDouble(info[1]);
-            double reload = Double.parseDouble(info[2]);
-            int range = Integer.parseInt(info[3]);
+            Tower targetTower = AnimeCraft.instance.getTowerManager().getTower(id);
             double
-                    a = Double.parseDouble(info[4]),
-                    b = Double.parseDouble(info[5]),
-                    c = Double.parseDouble(info[6]);
-            boolean shiny = Boolean.parseBoolean(info[7]);
-            Trait trait = Trait.valueOf(info[8]);
-            int level = Integer.parseInt(info[9]);
-            double experience = Double.parseDouble(info[10]);
-            UUID uuid = UUID.fromString(info[11]);
+                    a = Double.parseDouble(info[1]),
+                    b = Double.parseDouble(info[2]),
+                    c = Double.parseDouble(info[3]);
+            boolean shiny = Boolean.parseBoolean(info[4]);
+            Trait trait = Trait.valueOf(info[5]);
+            int level = Integer.parseInt(info[6]);
+            double experience = Double.parseDouble(info[7]);
+            UUID uuid = UUID.fromString(info[8]);
 
             Tower tower = AnimeCraft.instance.getTowerManager().getTower(id);
             if (tower == null)continue;
             tower.uuid = uuid;
-            tower.damage = (int) damage;
-            tower.cooldown = (int) reload;
-            tower.range = range;
+            tower.damage = targetTower.damage;
+            tower.cooldown = targetTower.cooldown;
+            tower.range = targetTower.range;
             tower.setShiny(shiny);
             tower.setOwner(e.getPlayer());
             tower.setId(id);
@@ -146,25 +146,39 @@ public class Listeners implements Listener {
     }
 
     @EventHandler
+    public void onSpawn(EntitySpawnEvent e) {
+    	if (e.getEntity() instanceof Player)return;
+    	if (e.getEntity() instanceof ArmorStand)return;
+    	if (!(e.getEntity() instanceof LivingEntity))return;
+    	instance.getTowerManager().currentEnemies.add(e.getEntity());
+    }
+    
+    @EventHandler
     public void onInteractEntity(PlayerInteractAtEntityEvent e) {
+    	Player player = e.getPlayer();
         if (e.getRightClicked() instanceof Zombie) {
             BannerMenu menu = new BannerMenu();
             menu.set(e.getPlayer());
         }
         if (e.getRightClicked() instanceof Cat) {
-            TowerMenu menu = new TowerMenu(true);
-            menu.set(e.getPlayer());
+        	dataFrom(player).towerMenu(player, true);
         }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
+    	Player player = e.getPlayer();
         if (e.getItem() != null && e.getItem().getType() != Material.AIR) {
             if (e.getHand() == EquipmentSlot.HAND) {
-                if (e.getItem().getType() == Material.PLAYER_HEAD || e.getItem().getType() == Material.MAGENTA_STAINED_GLASS_PANE) {
+            	if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getItem().getType() == Material.PLAYER_HEAD) {
+            		Tower tower = instance.getTowerManager().getTowerByItemVersion(dataFrom(player), e.getItem());
+            		tower.placeStand(player, e.getClickedBlock() == null ? player.getLocation() : e.getClickedBlock().getLocation().add(0, 2, 0));
                     e.setCancelled(true);
-                    TowerMenu menu = new TowerMenu(false);
-                    menu.set(e.getPlayer());
+            		return;
+            	}
+                if ((e.getAction() == Action.LEFT_CLICK_BLOCK && e.getItem().getType() == Material.PLAYER_HEAD) || e.getItem().getType() == Material.MAGENTA_STAINED_GLASS_PANE) {
+                    dataFrom(player).towerMenu(player, false);
+                    e.setCancelled(true);
                 }
             }
         }

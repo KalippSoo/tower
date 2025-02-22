@@ -35,7 +35,7 @@ public class StatsReroll {
         if (t<=-2.5)return " &eB-";
         if (t<0)return " &eB";
         return "";
-
+        
     }
 
 }

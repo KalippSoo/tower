@@ -1,12 +1,20 @@
 package eu.animecraft.tower;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
+import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
 import eu.animecraft.tower.towers.TowerIchigu;
 import eu.animecraft.tower.towers.TowerItochi;
@@ -17,6 +25,9 @@ import eu.animecraft.tower.towers.Nami.TowerNamiClimaStick;
 public class TowerManager {
     public List<Tower> availableTower = new ArrayList<>();
     public List<Tower> currentBanner = new ArrayList<>();
+    public List<Entity> currentEnemies = new ArrayList<>();
+    
+    public Map<Player, List<Tower>> activeTowers = new HashMap<>();
 
     public TowerManager() {
     	this.availableTower.add(new TowerItochi());
@@ -29,8 +40,56 @@ public class TowerManager {
         	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
             this.currentBanner.add(availableTower.get(random));
         }
-
+        
+        new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for (Player players : activeTowers.keySet()) {
+					List<Tower> towers = activeTowers.get(players);
+					List<Entity> removal = new ArrayList<>();
+					for (Tower tower : towers) {
+						
+						if (tower.currentCooldown > 0) {
+							tower.currentCooldown--;
+						}else {
+							tower.currentCooldown = (int) (tower.fc);
+							
+							Iterator<Entity> entities = currentEnemies.iterator();
+							while (entities.hasNext()) {
+								Entity entity = entities.next();
+								LivingEntity target = ((LivingEntity)entity);
+								double
+								x1 = tower.stand.getLocation().getX(),
+								x2 = entity.getLocation().getX(),
+								z1 = tower.stand.getLocation().getZ(),
+								z2 = entity.getLocation().getZ();
+								
+								double distance = calculateDistanceBetweenPoints(x1, z1, x2, z2);
+								if (distance > tower.fr)continue;
+								
+								target.damage(tower.fd);
+								if (target.isDead()) {
+									removal.add(target);
+								}
+							}
+							currentEnemies.removeAll(removal);
+							tower.stand.setVelocity(new Vector(0, 2, 0).multiply(0.2f));
+						}
+					}
+				}
+			}
+		}.runTaskTimer(AnimeCraft.instance, 0, 0);
+        
     }
+    
+    public double calculateDistanceBetweenPoints(
+    		  double x1, 
+    		  double y1, 
+    		  double x2, 
+    		  double y2) {       
+    		    return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    		}
 
     public Tower buyTower() {
         Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
@@ -41,13 +100,10 @@ public class TowerManager {
     }
 
     public Tower getTower(int id) {
-        Iterator<?> var3 = this.availableTower.iterator();
-
-        while(var3.hasNext()) {
-            Tower towers = (Tower)var3.next();
-            if (towers.getId() == id) {
-                return towers.clone();
-            }
+    	
+        for (Tower towers : this.availableTower) {
+        	if (towers.getId() == id)
+        		return towers.clone();
         }
 
         return null;
