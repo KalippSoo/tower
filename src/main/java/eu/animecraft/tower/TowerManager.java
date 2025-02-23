@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,6 +19,7 @@ import org.bukkit.util.Vector;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
+import eu.animecraft.data.components.Utils;
 import eu.animecraft.tower.towers.TowerIchigu;
 import eu.animecraft.tower.towers.TowerItochi;
 import eu.animecraft.tower.towers.TowerSonGoku;
@@ -42,13 +46,20 @@ public class TowerManager {
         }
         
         new BukkitRunnable() {
-			
+			int current;
 			@Override
 			public void run() {
 				for (Player players : activeTowers.keySet()) {
 					List<Tower> towers = activeTowers.get(players);
 					List<Entity> removal = new ArrayList<>();
 					for (Tower tower : towers) {
+						
+//						if (current >= 10) {
+//							current = 0;
+//							circle(players, tower.stand.getLocation(), (int) tower.fr);
+//						}else {
+//							current++;
+//						}
 						
 						if (tower.currentCooldown > 0) {
 							tower.currentCooldown--;
@@ -68,6 +79,7 @@ public class TowerManager {
 								double distance = calculateDistanceBetweenPoints(x1, z1, x2, z2);
 								if (distance > tower.fr)continue;
 								
+								
 								target.damage(tower.fd);
 								if (target.isDead()) {
 									removal.add(target);
@@ -76,11 +88,24 @@ public class TowerManager {
 							currentEnemies.removeAll(removal);
 							tower.stand.setVelocity(new Vector(0, 2, 0).multiply(0.2f));
 						}
+						
 					}
 				}
 			}
 		}.runTaskTimer(AnimeCraft.instance, 0, 0);
         
+    }
+    
+    public void circle(Player player, Location loc, int radius) {
+        for(int x = loc.getBlockX() - radius; x < loc.getBlockX() + radius; ++x) {
+            for(int y = loc.getBlockY() - radius; y < loc.getBlockY() + radius; ++y) {
+                for(int z = loc.getBlockZ() - radius; z < loc.getBlockZ() + radius; ++z) {
+                    if ((loc.getBlockX() - x) * (loc.getBlockX() - x) + (loc.getBlockY() - y) * (loc.getBlockY() - y) + (loc.getBlockZ() - z) * (loc.getBlockZ() - z) <= radius * radius && loc.getBlock().getType() == Material.AIR) {
+                        player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0.001);
+                    }
+                }
+            }
+        }
     }
     
     public double calculateDistanceBetweenPoints(
@@ -123,6 +148,20 @@ public class TowerManager {
         return null;
     }
 
+    public Tower getTowerByItemVersion(Player player, ItemStack item) {
+    	Data data = Utils.getData(player);
+        Iterator<?> var4 = data.getTowers().iterator();
+
+        while(var4.hasNext()) {
+            Tower towers = (Tower)var4.next();
+            if (towers.getItemVersion(0).isSimilar(item)) {
+                return towers;
+            }
+        }
+
+        return null;
+    }
+    
     public Tower getTowerByItemVersion(Data data, ItemStack item) {
         Iterator<?> var4 = data.getTowers().iterator();
 

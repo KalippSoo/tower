@@ -35,7 +35,7 @@ public class Tower {
     private Trait trait = Trait.none;
     private int id;
     private boolean shiny;
-    public ArmorStand stand;
+    public ArmorStand stand = null;
     /*
     Just write manually the damage, cooldown and the range with the leveling system create a new instance.
      */
@@ -114,6 +114,7 @@ public class Tower {
         tower.fd = fd;
         tower.fc = fc;
         tower.fr = fr;
+        updateStats();
         return tower;
 
     }

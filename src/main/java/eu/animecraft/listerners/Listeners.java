@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
@@ -38,19 +37,6 @@ import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.Trait;
 
 public class Listeners extends EventListener {
-
-    public void circle(Location loc, int radius) {
-        for(int x = loc.getBlockX() - radius; x < loc.getBlockX() + radius; ++x) {
-            for(int y = loc.getBlockY() - radius; y < loc.getBlockY() + radius; ++y) {
-                for(int z = loc.getBlockZ() - radius; z < loc.getBlockZ() + radius; ++z) {
-                    if ((loc.getBlockX() - x) * (loc.getBlockX() - x) + (loc.getBlockY() - y) * (loc.getBlockY() - y) + (loc.getBlockZ() - z) * (loc.getBlockZ() - z) <= radius * radius && loc.getBlock().getType() == Material.AIR) {
-                        loc.getBlock().setType(Material.CYAN_WOOL);
-                    }
-                }
-            }
-        }
-
-    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {

@@ -33,10 +33,13 @@ public class TowerListener extends EventListener{
 		stand.setBasePlate(false);
 		stand.setArms(true);
 		((LivingEntity)stand).getEquipment().setHelmet(tower.getItemVersion(0));
-		List<Tower> activeTowers = instance.getTowerManager().activeTowers.get(player) != null ? instance.getTowerManager().activeTowers.get(player) : new ArrayList<>();
-		
 		tower.stand = stand;
+		System.out.println(tower.stand.getCustomName());
+		System.out.println(tower.stand.getLocation());
+		System.out.println(tower.fr);
+		List<Tower> activeTowers = instance.getTowerManager().activeTowers.get(player) != null ? instance.getTowerManager().activeTowers.get(player) : new ArrayList<>();
 		activeTowers.add(tower);
+		
 		instance.getTowerManager().activeTowers.put(player, activeTowers);
 	}
 	

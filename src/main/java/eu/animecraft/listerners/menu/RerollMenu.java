@@ -39,7 +39,8 @@ public class RerollMenu extends Menu {
                     Trait newTrait = Trait.getTraitResult();
                     tower.setTrait(newTrait);
                     getInventory().setItem(13, tower.getItemVersion(2));
-                    getInventory().setItem(31, Utils.createItem(Material.GREEN_CONCRETE, 1, "&fCurrent: "+tower.getTrait().getRarity().getColor()+tower.getTrait().name().toUpperCase(), "&fYou can reroll " + getData().rerolls + " times !"));
+                    getData().rerolls--;
+                    Utils.changeItem(getInventory().getItem(31), "&fCurrent: "+tower.getTrait().getName(), "&fYou can reroll " + getData().rerolls + " times !");
                     break;
                 case BARRIER:
                     TowerMenu menu = new TowerMenu(true);

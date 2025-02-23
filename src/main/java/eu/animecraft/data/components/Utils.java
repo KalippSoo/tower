@@ -97,6 +97,27 @@ public class Utils {
         helm.setItemMeta(meta);
         return helm;
     }
+    
+    public static ItemStack changeItem(ItemStack item, String name, String... lores) {
+        ItemMeta meta = item.getItemMeta();
+        if (name != null) {
+            meta.setDisplayName(color(name));
+        }
+
+        ArrayList<String> lines = new ArrayList<>();
+        String[] var10 = lores;
+        int var9 = lores.length;
+
+        for(int var8 = 0; var8 < var9; ++var8) {
+            String line = var10[var8];
+            lines.add(color(line));
+        }
+
+        meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ATTRIBUTES});
+        meta.setLore(lines);
+        item.setItemMeta(meta);
+        return item;
+    }
 
     public static String stripColor(String text) {
         return ChatColor.stripColor(text);

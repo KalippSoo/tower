@@ -3,10 +3,10 @@ package eu.animecraft.tower.tools;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum Trait {
-    UNIQUE(6, Rarity.MYTHIC),
-    PARTICULAR(7, Rarity.MYTHIC),
-    STAR(8, Rarity.MYTHIC),
-    DEADLY(9, Rarity.LEGENDARY),
+    UNIQUE(0.1, Rarity.MYTHIC),
+    PARTICULAR(0.25, Rarity.MYTHIC),
+    STAR(0.5, Rarity.MYTHIC),
+    DEADLY(2, Rarity.LEGENDARY),
     SKILLED(10, Rarity.LEGENDARY),
     QUICKLEANER(15, Rarity.LEGENDARY),
     VISION(30, Rarity.EPIC),
@@ -16,11 +16,13 @@ public enum Trait {
     ;
 	
     private double chance;
+    private String name;
     private Rarity rarity;
 
     Trait(double chance, Rarity rarity){
         this.chance = chance;
         this.rarity = rarity;
+        this.name = rarity.getColor()+name();
     }
     public static Trait getTraitResult(){
 
@@ -67,6 +69,9 @@ public enum Trait {
     
 	public Rarity getRarity() {
 		return rarity;
+	}
+	public String getName() {
+		return name;
 	}
 
 }
