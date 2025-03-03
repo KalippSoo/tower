@@ -1,0 +1,6 @@
+#
+# Mode changing the entire GAMEPLAY aspect
+# 0 = Lobby
+# 1 = GamePlay
+#
+mode: 0

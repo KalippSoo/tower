@@ -1,4 +1,4 @@
-package eu.animecraft.tower.towers.Nami;
+package eu.animecraft.tower.towers;
 
 import java.util.UUID;
 

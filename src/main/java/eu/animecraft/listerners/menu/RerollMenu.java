@@ -17,6 +17,7 @@ public class RerollMenu extends Menu {
             getPlayer().closeInventory();
             Utils.sendMessages(getPlayer(), "&cAn error has closed the inventory, try again !");
         }
+        
     }
 
     @Override
@@ -31,20 +32,23 @@ public class RerollMenu extends Menu {
 
     @Override
     public void HandleMenu(InventoryClickEvent e) {
-
+    	
         if (e.getClickedInventory() == this.getInventory()){
 
             switch(e.getCurrentItem().getType()){
                 case GREEN_CONCRETE:
+                	if (!getData().reroll()) {
+                		getPlayer().closeInventory();
+                		getPlayer().sendTitle("", "&cYou don't have any rerolls !", 5, 40, 5);
+                		return;
+                    }
                     Trait newTrait = Trait.getTraitResult();
                     tower.setTrait(newTrait);
                     getInventory().setItem(13, tower.getItemVersion(2));
-                    getData().rerolls--;
                     Utils.changeItem(getInventory().getItem(31), "&fCurrent: "+tower.getTrait().getName(), "&fYou can reroll " + getData().rerolls + " times !");
                     break;
                 case BARRIER:
-                    TowerMenu menu = new TowerMenu(true);
-                    menu.set(getPlayer());
+                	getData().towerMenu(getPlayer(), true);
                     break;
 			default:
 				break;

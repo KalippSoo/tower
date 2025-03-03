@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,21 +20,24 @@ import org.bukkit.util.Vector;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
+import eu.animecraft.data.components.NMSClass;
+import eu.animecraft.data.components.TowerComponent;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.tower.towers.TowerIchigu;
 import eu.animecraft.tower.towers.TowerItochi;
+import eu.animecraft.tower.towers.TowerNami;
+import eu.animecraft.tower.towers.TowerNamiClimaStick;
 import eu.animecraft.tower.towers.TowerSonGoku;
-import eu.animecraft.tower.towers.Nami.TowerNami;
-import eu.animecraft.tower.towers.Nami.TowerNamiClimaStick;
 
 public class TowerManager {
     public List<Tower> availableTower = new ArrayList<>();
     public List<Tower> currentBanner = new ArrayList<>();
     public List<Entity> currentEnemies = new ArrayList<>();
     
-    public Map<Player, List<Tower>> activeTowers = new HashMap<>();
+    public Map<Player, List<TowerComponent>> activeTower = new HashMap<>();
 
     public TowerManager() {
+    	
     	this.availableTower.add(new TowerItochi());
         this.availableTower.add(new TowerSonGoku());
         this.availableTower.add(new TowerIchigu());
@@ -46,82 +50,117 @@ public class TowerManager {
         }
         
         new BukkitRunnable() {
-			int current;
 			@Override
 			public void run() {
-				for (Player players : activeTowers.keySet()) {
-					List<Tower> towers = activeTowers.get(players);
-					List<Entity> removal = new ArrayList<>();
-					for (Tower tower : towers) {
-						
-//						if (current >= 10) {
-//							current = 0;
-//							circle(players, tower.stand.getLocation(), (int) tower.fr);
-//						}else {
-//							current++;
-//						}
-						
-						if (tower.currentCooldown > 0) {
-							tower.currentCooldown--;
-						}else {
-							tower.currentCooldown = (int) (tower.fc);
+				for (Player players : activeTower.keySet()) {
+					for (TowerComponent tcs : activeTower.get(players)) {
+						List<Entity> removal = new ArrayList<>();
+						circleInput(players, (int) tcs.tower.fr, tcs.towers.keySet());
+						for (ArmorStand stands : tcs.towers.keySet()) {
+							int tick = tcs.towers.get(stands);
 							
-							Iterator<Entity> entities = currentEnemies.iterator();
-							while (entities.hasNext()) {
-								Entity entity = entities.next();
-								LivingEntity target = ((LivingEntity)entity);
-								double
-								x1 = tower.stand.getLocation().getX(),
-								x2 = entity.getLocation().getX(),
-								z1 = tower.stand.getLocation().getZ(),
-								z2 = entity.getLocation().getZ();
+							if (tick > 0) {
+								tick--;
+							}else {
+								tick = (int) (tcs.tower.fc);
 								
-								double distance = calculateDistanceBetweenPoints(x1, z1, x2, z2);
-								if (distance > tower.fr)continue;
-								
-								
-								target.damage(tower.fd);
-								if (target.isDead()) {
-									removal.add(target);
+								Iterator<Entity> entities = currentEnemies.iterator();
+								while (entities.hasNext()) {
+									Entity entity = entities.next();
+									LivingEntity target = ((LivingEntity)entity);
+									double
+									x1 = stands.getLocation().getX(),
+									x2 = entity.getLocation().getX(),
+									z1 = stands.getLocation().getZ(),
+									z2 = entity.getLocation().getZ(),
+									y1 = stands.getLocation().getZ(),
+									y2 = entity.getLocation().getZ();
+									
+									double distance = calculateDistanceBetweenPoints(x1, z1, y1, x2, z2, y2);
+									if (distance > tcs.tower.fr)continue;
+									
+									
+									target.damage(tcs.tower.fd);
+									if (target.isDead()) {
+										removal.add(target);
+									}
 								}
+								currentEnemies.removeAll(removal);
+								stands.setVelocity(new Vector(0, 2, 0).multiply(0.2f));
 							}
-							currentEnemies.removeAll(removal);
-							tower.stand.setVelocity(new Vector(0, 2, 0).multiply(0.2f));
+							tcs.towers.put(stands, tick);
 						}
-						
 					}
 				}
 			}
 		}.runTaskTimer(AnimeCraft.instance, 0, 0);
         
     }
-    
-    public void circle(Player player, Location loc, int radius) {
-        for(int x = loc.getBlockX() - radius; x < loc.getBlockX() + radius; ++x) {
-            for(int y = loc.getBlockY() - radius; y < loc.getBlockY() + radius; ++y) {
-                for(int z = loc.getBlockZ() - radius; z < loc.getBlockZ() + radius; ++z) {
-                    if ((loc.getBlockX() - x) * (loc.getBlockX() - x) + (loc.getBlockY() - y) * (loc.getBlockY() - y) + (loc.getBlockZ() - z) * (loc.getBlockZ() - z) <= radius * radius && loc.getBlock().getType() == Material.AIR) {
-                        player.spawnParticle(Particle.VILLAGER_HAPPY, loc, 1, 0, 0, 0, 0.001);
+
+    public static List<Location> generateSphere(Location centerBlock, int radius, boolean hollow) {
+        
+        List<Location> circleBlocks = new ArrayList<Location>();
+
+        int bx = centerBlock.getBlockX();
+        int by = centerBlock.getBlockY();
+        int bz = centerBlock.getBlockZ();
+     
+        for(int x = bx - radius; x <= bx + radius; x++) {
+            for(int y = by - radius; y <= by + radius; y++) {
+                for(int z = bz - radius; z <= bz + radius; z++) {
+                 
+                    double distance = ((bx-x) * (bx-x) + ((bz-z) * (bz-z)) + ((by-y) * (by-y)));
+                 
+                    if(distance < radius * radius && !(hollow && distance < ((radius - 1) * (radius - 1)))) {
+                     
+                        Location l = new Location(centerBlock.getWorld(), x, y, z);
+                        circleBlocks.add(l);
+                        
                     }
                 }
             }
         }
+     
+        return circleBlocks;
+    }
+ 
+    
+    int current = 0, MaxTick = 20;
+    public void circleInput(Player player, int radius, Set<ArmorStand> set) {
+    	
+    	if (current >= MaxTick) {
+    		for (ArmorStand stands : set) {
+        		List<Location> blocksLocation = generateSphere(stands.getLocation(), radius, true);
+        		for (Location locs : blocksLocation) {
+        			NMSClass.sendParticle(player, Particle.VILLAGER_HAPPY, true, locs, 0, 0, 0, 0.1f, 1);
+        		}
+    		}
+    		current = 0;
+    	}
+    	current++;
+    	
     }
     
     public double calculateDistanceBetweenPoints(
     		  double x1, 
-    		  double y1, 
+    		  double y1,
+    		  double z1,
     		  double x2, 
-    		  double y2) {       
-    		    return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    		  double y2,
+    		  double z2) {       
+    		    return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1) + ((z2-z1) * (z2-z1)));
     		}
 
-    public Tower buyTower() {
-        Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
-        if (Math.random() * 101.0 <= 1.0) {
-            tower.setShiny(true);
+    public List<Tower> buyTower(int count) {
+    	List<Tower> towers = new ArrayList<>();
+        for (int i = 0; i<=count; i++) {
+            Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
+            if (Math.random() * 101.0 <= 1.0) {
+                tower.setShiny(true);
+            }
+            towers.add(tower);
         }
-        return tower;
+        return towers;
     }
 
     public Tower getTower(int id) {
@@ -154,7 +193,7 @@ public class TowerManager {
 
         while(var4.hasNext()) {
             Tower towers = (Tower)var4.next();
-            if (towers.getItemVersion(0).isSimilar(item)) {
+            if (isSimilar(towers.getItemVersion(0), item)) {
                 return towers;
             }
         }
@@ -162,16 +201,20 @@ public class TowerManager {
         return null;
     }
     
-    public Tower getTowerByItemVersion(Data data, ItemStack item) {
-        Iterator<?> var4 = data.getTowers().iterator();
-
-        while(var4.hasNext()) {
-            Tower towers = (Tower)var4.next();
-            if (towers.getItemVersion(0).isSimilar(item)) {
-                return towers;
-            }
-        }
-
-        return null;
+    private boolean isSimilar(ItemStack original, ItemStack item) {
+    	return original.getAmount() == item.getAmount() && 
+    			original.getItemMeta().getDisplayName().equals(item.getItemMeta().getDisplayName()) && 
+    			original.getItemMeta().getLore().get(0).equals(item.getItemMeta().getLore().get(0)) && 
+    				original.getItemMeta().getLore().get(1).equals(item.getItemMeta().getLore().get(1)) &&
+    				original.getItemMeta().getLore().get(2).equals(item.getItemMeta().getLore().get(2));
     }
 }
+
+
+
+
+
+
+
+
+

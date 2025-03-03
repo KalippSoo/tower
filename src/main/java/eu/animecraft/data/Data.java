@@ -32,7 +32,16 @@ public class Data {
 
     public Data() {
     }
-
+    
+    public boolean reroll() {
+    	if(rerolls<=0) {
+    		return false;
+    	}else {
+    		rerolls--;
+    		return true;
+    	}
+    }
+    
     public TowerMenu towerMenu(Player player, boolean mode) {
     	towerMenu.rerollMenu = mode;
     	towerMenu.set(player);
@@ -94,8 +103,4 @@ public class Data {
     public void setMaxStorageSize(int maxStorageSize) {
         this.maxStorageSize = maxStorageSize;
     }
-
-	public TowerMenu getTowerMenu() {
-		return towerMenu;
-	}
 }

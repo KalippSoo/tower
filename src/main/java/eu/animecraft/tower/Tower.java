@@ -4,7 +4,9 @@ import static eu.animecraft.data.components.Utils.format;
 import static eu.animecraft.data.components.Utils.sendMessages;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -25,7 +27,7 @@ import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 import eu.animecraft.tower.tools.Trait;
 
-public class Tower {
+public class Tower{
 	
     private int count;
     private int maxCount;
@@ -35,17 +37,18 @@ public class Tower {
     private Trait trait = Trait.none;
     private int id;
     private boolean shiny;
-    public ArmorStand stand = null;
     /*
     Just write manually the damage, cooldown and the range with the leveling system create a new instance.
      */
     public Tower evo = null;
     public DamageType[] damageTypes;
-    public int damage, cooldown, range;
+    public int damage, cooldown, range, critChance;
     public double fd, fc, fr;
+    public boolean locked = false;
     public StatsReroll statsReroll = new StatsReroll(0,0,0);
     public Lvl lvlSystem = new Lvl(this);
     public UUID uuid;
+    public Map<ArmorStand, Long> activeTowers = new HashMap<>();
     
     //Atacking parameters
     public int currentCooldown = 0;
@@ -108,6 +111,7 @@ public class Tower {
         Tower tower = new Tower(id, rarity, name, owner, shiny, maxCount, uuid, value, signature, sValue, sSignature);
         tower.uuid = UUID.randomUUID();
         tower.damage = damage;
+        tower.owner = owner;
         tower.cooldown = cooldown;
         tower.range = range;
         tower.statsReroll = statsReroll;

@@ -40,7 +40,14 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputFile>C:\Users\bouch\Desktop\Servers\SquidCraft\Servers\TowerCity\plugins\AnimeTower.jar</outputFile>
+                <outputFile>C:\Users\bouch\Desktop\Servers\SquidCraft\Servers\TowerCity\plugins\AnimeTower.jar</outputFile>
+                    <!--
+						
+						 
+                   <outputFile>C:\Users\bouch\Desktop\Servers\SquidCraft\Servers\sub-towercity1\plugins\AnimeTower.jar</outputFile>
+						
+						
+						-->
                 </configuration>
             </plugin>
         </plugins>

@@ -170,12 +170,19 @@ public class Utils {
     public static void sendMessages(Player player, String... texts) {
         String[] var5 = texts;
         int var4 = texts.length;
-
         for(int var3 = 0; var3 < var4; ++var3) {
             String line = var5[var3];
             player.sendMessage(color(line));
         }
+        for(String lines : texts) {
+            player.sendMessage(color(check(player, lines)));
+        }
 
+    }
+    
+    private static String check(Player player, String lines) {
+    	
+    	return lines.replace("%name%", player.getName());
     }
 
     public static void sendMessages(CommandSender sender, String... texts) {

@@ -46,7 +46,7 @@ public class TowerPlaceEvent extends Event{
 	}
 
 	public Tower getTower() {
-		return tower.clone();
+		return tower;
 	}
 
 	public Location getLocation() {

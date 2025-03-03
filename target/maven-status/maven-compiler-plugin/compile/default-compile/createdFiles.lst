@@ -1,3 +1,4 @@
+eu\animecraft\listerners\Listeners$2.class
 eu\animecraft\data\components\Utils.class
 eu\animecraft\event\TowerRemoveEvent.class
 eu\animecraft\data\Lvl.class
@@ -20,12 +21,14 @@ eu\animecraft\listerners\menu\ResultMenu.class
 eu\animecraft\listerners\menu\RerollMenu.class
 eu\animecraft\AnimeCraft.class
 eu\animecraft\data\Data.class
+eu\animecraft\listerners\menu\BuyBannerMenu$2.class
 eu\animecraft\data\ResistanceType.class
 eu\animecraft\tower\towers\TowerIchigu.class
-eu\animecraft\listerners\menu\SellingMenu.class
 eu\animecraft\tower\tools\AttackType.class
 eu\animecraft\tower\tools\Rarity.class
 eu\animecraft\group\GroupManager.class
+eu\animecraft\listerners\menu\PlayMenu$1.class
+eu\animecraft\listerners\Listeners$1.class
 eu\animecraft\group\Group.class
 eu\animecraft\tower\Tower.class
 eu\animecraft\data\components\SkullCreator.class

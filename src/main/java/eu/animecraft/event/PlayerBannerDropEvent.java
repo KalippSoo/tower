@@ -14,15 +14,17 @@ public class PlayerBannerDropEvent extends Event implements Cancellable{
 	
 	private Player player;
 	private Data data;
+	private int count;
 	
 	private int bannerID;
 	
 	boolean cancelled = false;
 	
-	public PlayerBannerDropEvent(Player player, int id) {
+	public PlayerBannerDropEvent(Player player, int count, int id) {
 		this.player = player;
 		this.data = Utils.getData(player);
 		this.bannerID = id;
+		this.count = count;
 	}
 
 	@Override
@@ -58,6 +60,10 @@ public class PlayerBannerDropEvent extends Event implements Cancellable{
 
 	public Data getData() {
 		return data;
+	}
+
+	public int getCount() {
+		return count;
 	}
 	
 }

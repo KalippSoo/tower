@@ -46,14 +46,11 @@ public class BannerMenu extends Menu {
                     Utils.sendMessages(player, new String[]{"&cYou don't have enough gems !"});
                     return;
                 }
-
-                for(int i = 0; i < item.getAmount(); ++i) {
-                	
-                	PlayerBannerDropEvent event = new PlayerBannerDropEvent(player, 0);
-                	if (!event.isCancelled()) {
-                		Bukkit.getPluginManager().callEvent(event);
-                	}
-                }
+            	
+            	PlayerBannerDropEvent event = new PlayerBannerDropEvent(player, (item.getAmount()-1), 0);
+            	if (!event.isCancelled()) {
+            		Bukkit.getPluginManager().callEvent(event);
+            	}
                 
 		default:
 			break;
@@ -81,6 +78,6 @@ public class BannerMenu extends Menu {
         this.getInventory().setItem(16, Utils.createItem(Material.LAPIS_LAZULI, 1, "&9Gems: &d" + this.instance.getDataManager().getPlayerData().get(this.getPlayer().getUniqueId()).gems));
         this.getInventory().setItem(49, Utils.createItem(Material.BARRIER, 1, "&cLeave"));
         this.getInventory().setItem(39, Utils.createItem(Material.LIME_DYE, 1, "&aBuy 1"));
-        this.getInventory().setItem(41, Utils.createItem(Material.LIME_DYE, 5, "&aBuy 5"));
+        this.getInventory().setItem(41, Utils.createItem(Material.LIME_DYE, 10, "&aBuy 10"));
     }
 }
