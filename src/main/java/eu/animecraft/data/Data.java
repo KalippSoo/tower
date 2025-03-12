@@ -1,7 +1,9 @@
 package eu.animecraft.data;
 
+import eu.animecraft.arena.Arena;
 import eu.animecraft.group.Group;
 import eu.animecraft.listerners.menu.TowerMenu;
+import eu.animecraft.play.Play;
 import eu.animecraft.tower.Tower;
 
 import java.util.ArrayList;
@@ -18,8 +20,12 @@ public class Data {
     private List<String> listSelected = new ArrayList<>();
     private int maxStorageSize;
     
-    //Menu management
+    private Arena arena;
+    public int po;
+    
+    //No need at first connect
     private TowerMenu towerMenu = new TowerMenu(false);
+    public Play play = null;
     
     public int gems = 0;
     public int gold = 0;
@@ -31,6 +37,52 @@ public class Data {
     public Banner banner;
 
     public Data() {
+    }
+    
+    public boolean isSelectedFull() {
+    	
+    	int i = 0;
+    	for (String string : this.listSelected) {
+    		if (string.length() > 8)
+    			i++;
+    	}
+    	if (i == 6)
+    		return true;
+    	
+    	return false;
+    }
+    
+    public boolean addTowerToListedSelection(Tower tower) {
+    	
+    	int target = -1;
+    	for (String string : getListSelected()) {
+    		target++;
+    		if (string.length() < 8) 
+    			break;
+    	}
+    	if (target>-1) {
+    		getListSelected().set(target, tower.uuid.toString());
+    		return true;
+    	}
+    	return false;
+    }
+    public boolean removeTowerToListedSelection(Tower tower) {
+
+    	int target = -1;
+    	boolean found = false;
+    	for (String string : getListSelected()) {
+    		target++;
+    		if (tower.uuid.toString().equals(string)) {
+    			found=true;
+    			break;
+    		}
+    			
+    	}
+    	if (found) {
+    		getListSelected().set(target, "none");
+    		return true;
+    	}
+    	return false;
     }
     
     public boolean reroll() {
@@ -103,4 +155,15 @@ public class Data {
     public void setMaxStorageSize(int maxStorageSize) {
         this.maxStorageSize = maxStorageSize;
     }
+
+	public boolean isPlaying() {
+		return this.getArena()!=null;
+	}
+
+	public Arena getArena() {
+		return arena;
+	}	
+	public void setArena(Arena arena) {
+		this.arena = arena;
+	}
 }

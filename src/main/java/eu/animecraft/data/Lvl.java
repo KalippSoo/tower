@@ -13,7 +13,7 @@ public class Lvl {
     int currentLevel = 1;
     double currentExp = 0.0;
     //Gain after each lvl
-    double pourcentage = 5.6;
+    double pourcentage = 4.6;
     
     double[] levelingUp = new double[]{
             2050.0, 8050.0, 18050.0, 32050.0, 50050.0, 72050.0, 98050.0, 128100.0, 162100.0, 200100.0, 242100.0, 288100.0,
@@ -43,26 +43,18 @@ public class Lvl {
 
     }
 
-    public void addLevel(Tower tower) {
+    public void addLevel() {
         if (this.currentLevel != this.maxLevel) {
             ++this.currentLevel;
+            tower.updateItem();
         }
     }
 
     public void addExp(double exp) {
         this.currentExp += exp;
-        if (this.currentLevel != 50) {
+        if (this.currentLevel < 50) {
             if (this.currentExp >= this.levelingUp[this.currentLevel]) {
-                this.addLevel(tower);
-                boolean extraLvl = true;
-
-                while(extraLvl) {
-                    if (this.currentExp >= this.levelingUp[this.getCurrentLevel()]) {
-                        this.addLevel(tower);
-                    } else {
-                        extraLvl = false;
-                    }
-                }
+                this.addLevel();
             }
 
         }
@@ -77,6 +69,7 @@ public class Lvl {
     }
 
     public double getDamage(){
-        return tower.damage += ((tower.damage * (pourcentage * currentLevel))/100);
+    	int damage = (int) (tower.damage + ((tower.damage * (pourcentage * currentLevel))/100));
+        return damage;
     }
 }

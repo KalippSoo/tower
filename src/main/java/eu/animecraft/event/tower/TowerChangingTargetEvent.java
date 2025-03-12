@@ -1,9 +1,9 @@
-package eu.animecraft.event;
+package eu.animecraft.event.tower;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TowerAbilityEvent extends Event{
+public class TowerChangingTargetEvent extends Event{
 
 	private static HandlerList HANDLERS = new HandlerList();
 	
@@ -17,5 +17,4 @@ public class TowerAbilityEvent extends Event{
 		// TODO Auto-generated method stub
 		return HANDLERS;
 	}
-	
 }

@@ -1,7 +1,6 @@
 package eu.animecraft.data.components;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import org.bukkit.Bukkit;
@@ -9,9 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.CraftParticle;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent.ChatSerializer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutPlayerListHeaderFooter;
+import net.minecraft.server.v1_16_R3.PacketPlayOutUpdateAttributes;
 import net.minecraft.server.v1_16_R3.ParticleParam;
 
 public class NMSClass {
@@ -40,30 +37,24 @@ public class NMSClass {
 		
 	}
 	
-	public static void sendTabListPacket(Player player, String h, String f) {
-		
-		try {
-			PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter();
-			
-			IChatBaseComponent JSONheader = ChatSerializer.a("{\"text\": \"" + h + "\"}");
-	        IChatBaseComponent JSONfooter = ChatSerializer.a("{\"text\": \"" + f + "\"}");
-	        
-	        Field header = packet.getClass().getDeclaredField("header");
-			header.setAccessible(true);
-			header.set(packet, JSONheader);
-			header.setAccessible(false);
-	        Field footer = packet.getClass().getDeclaredField("footer");
-	        footer.setAccessible(true);
-	        footer.set(packet, JSONfooter);
-	        footer.setAccessible(false);
-	        
-	        sendPacket(player, packet);
-		} catch (IllegalAccessException | IllegalArgumentException | SecurityException | NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+//	public static void sendTabListPacket(Player player, String h, String f) {
+//		
+//		try {
+//
+//			PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter();
+//			
+//			IChatBaseComponent JSONheader = .a("{\"text\": \"" + h + "\"}");
+//	        IChatBaseComponent JSONfooter = ChatComponentUtils.a("{\"text\": \"" + f + "\"}");
+//	        
+//	        
+//	        
+//	        sendPacket(player, packet);
+//		} catch (IllegalArgumentException | SecurityException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//	}
 	
 	public static void sendParticle(Player player, org.bukkit.Particle particle, boolean hard, Location l, float offsetX, float offsetY, float offsetZ, float speed, int count) {
 		

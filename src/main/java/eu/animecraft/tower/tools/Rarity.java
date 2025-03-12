@@ -10,7 +10,8 @@ public enum Rarity {
     EPIC("EPIC TOWER", ChatColor.of(new Color(30, 185, 255))),
     LEGENDARY("LEGENDARY TOWER", ChatColor.of(new Color(255, 215, 60))),
     MYTHIC("MYTHIC TOWER", ChatColor.of(new Color(245, 120, 235))),
-    LIMITED("LIMITED TOWER", ChatColor.of(new Color(235, 65, 65)));
+    SECRET("SECRET TOWER", ChatColor.of(new Color(235, 65, 65))),
+    LIMITED("LIMITED TOWER", ChatColor.of(new Color(45, 215, 136)));
 
     private String name;
     private ChatColor color;

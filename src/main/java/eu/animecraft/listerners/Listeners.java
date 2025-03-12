@@ -13,7 +13,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -23,17 +22,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
+import eu.animecraft.data.DataManager;
 import eu.animecraft.data.DocumentRelated;
+import eu.animecraft.data.Lvl;
 import eu.animecraft.data.StatsReroll;
 import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
+import eu.animecraft.event.play.PlayerLeftPlayEvent;
+import eu.animecraft.event.player.PlayerWinEvent;
 import eu.animecraft.listerners.menu.BannerMenu;
+import eu.animecraft.listerners.menu.RewardsMenu;
 import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.Trait;
 
@@ -46,93 +48,68 @@ public class Listeners extends EventListener {
         if (!AnimeCraft.instance.getDataManager().getPlayerData().containsKey(e.getPlayer().getUniqueId())) {
             AnimeCraft.instance.getDataManager().getPlayerData().put(e.getPlayer().getUniqueId(), new Data());
         }
+		
+		Data data = Utils.getData(player);
+        DocumentRelated.createGetDocument(player, data);
+
+        if (data.getListSelected().isEmpty()){
+            List<String> list = new ArrayList<>();
+            for(int i = 1; i<= 6; i++){
+                list.add("");
+            }
+            data.setListSelected(list);
+        }
+
+        Document stats = DocumentRelated.getSpecificDocument(player, "stats");
+        Document inventory = DocumentRelated.getSpecificDocument(player, "inventory");
+
+        Iterator<String> towers = inventory.getList("contents", String.class).iterator();
+
+        while(towers.hasNext()){
+            String[] info = ((String)towers.next()).split(",");
+            int id = Integer.parseInt(info[0]);
+            Tower targetTower = AnimeCraft.instance.getTowerManager().getTower(id);
+            double
+                    a = Double.parseDouble(info[1]),
+                    b = Double.parseDouble(info[2]),
+                    c = Double.parseDouble(info[3]);
+            boolean shiny = Boolean.parseBoolean(info[4]);
+            Trait trait = Trait.valueOf(info[5]);
+            int level = Integer.parseInt(info[6]);
+            double experience = Double.parseDouble(info[7]);
+            UUID uuid = UUID.fromString(info[8]);
+            boolean locked = info[9] == null?false:Boolean.parseBoolean(info[9]);
+            
+            Lvl lvlSystem = new Lvl(targetTower);
+            lvlSystem.setLevel(level);
+            lvlSystem.addExp(experience);
+            
+            Tower tower = new Tower(uuid, targetTower.damage, targetTower.cooldown, targetTower.range,
+            		shiny, player, id, lvlSystem, new StatsReroll(a,b,c), trait, targetTower.getRarity(),
+            		targetTower.getMaxCount(), targetTower.value, targetTower.sValue, targetTower.getName(),
+            		locked);
+            if (tower.range == 0) continue;
+            data.getTowers().add(tower);
+        }
+
+        String group = stats.getString("rank");
+
+        data.setGroup(AnimeCraft.instance.getGroupManager().getGroup(group));
+        player.setScoreboard(AnimeCraft.instance.getGroupManager().getScoreboard());
+        AnimeCraft.instance.getGroupManager().getTeam(player).addEntry(player.getName());
         
-        new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				Data data = AnimeCraft.instance.getDataManager().getPlayerData().get(player.getUniqueId());
-		        DocumentRelated.createGetDocument(player, data);
-
-		        if (data.getListSelected().isEmpty()){
-		            List<String> list = new ArrayList<>();
-		            for(int i = 1; i<= 6; i++){
-		                list.add("");
-		            }
-		            data.setListSelected(list);
-		        }
-
-		        Document stats = DocumentRelated.getSpecificDocument(player, "stats");
-		        Document inventory = DocumentRelated.getSpecificDocument(player, "inventory");
-
-		        Iterator<String> towers = inventory.getList("contents", String.class).iterator();
-
-		        while(towers.hasNext()){
-		            String[] info = ((String)towers.next()).split(",");
-		            int id = Integer.parseInt(info[0]);
-		            Tower targetTower = AnimeCraft.instance.getTowerManager().getTower(id);
-		            double
-		                    a = Double.parseDouble(info[1]),
-		                    b = Double.parseDouble(info[2]),
-		                    c = Double.parseDouble(info[3]);
-		            boolean shiny = Boolean.parseBoolean(info[4]);
-		            Trait trait = Trait.valueOf(info[5]);
-		            int level = Integer.parseInt(info[6]);
-		            double experience = Double.parseDouble(info[7]);
-		            UUID uuid = UUID.fromString(info[8]);
-
-		            Tower tower = AnimeCraft.instance.getTowerManager().getTower(id);
-		            if (tower == null)continue;
-		            tower.uuid = uuid;
-		            tower.damage = targetTower.damage;
-		            tower.cooldown = targetTower.cooldown;
-		            tower.range = targetTower.range;
-		            tower.setShiny(shiny);
-		            tower.setOwner(player);
-		            tower.setId(id);
-		            tower.lvlSystem.setLevel(level);
-		            tower.lvlSystem.addExp(experience);
-		            tower.statsReroll = new StatsReroll(a,b,c);
-		            tower.setTrait(trait == null ? Trait.none : trait);
-		            data.getTowers().add(tower);
-		        }
-
-		        String group = stats.getString("rank");
-
-		        data.setGroup(AnimeCraft.instance.getGroupManager().getGroup(group));
-		        player.setScoreboard(AnimeCraft.instance.getGroupManager().getScoreboard());
-		        AnimeCraft.instance.getGroupManager().getTeam(player).addEntry(player.getName());
-
-		        int input = 1;
-		        for (String uuid : DocumentRelated.getSpecificDocument(player, "menu").getList("selection", String.class)){
-		            ItemStack item = null;
-		            if (uuid == "none" || uuid == "")continue;
-		            for (Tower tower : data.getTowers()){
-		                if (uuid.equals(tower.uuid.toString())) {
-		                    item = tower.getItemVersion(0);
-		                    break;
-		                }
-		            }
-		            if (item == null) {
-		                player.getInventory().setItem(input, Utils.createItem(Material.MAGENTA_STAINED_GLASS_PANE, 1, "&fPlacement: " + (input), new String[]{"&eClick to open the tower menu"}));
-		            } else {
-		                player.getInventory().setItem(input, item);
-		            }
-		            input++;
-		        }
-			}
-		}.runTaskLater(instance, 40);
+        data.setListSelected((DocumentRelated.getSpecificDocument(player, "menu").getList("selection", String.class)));
+        DataManager.changeInventory(player, 0);
+	            
 		player.sendTitle(Utils.color("&fWelcome &e"+player.getName()), Utils.color("&cThis mode is still in beta !"), 5, 80, 5);
 		Utils.sendMessages(player, "&cPlease contact us, if there's something wrong !!");
-        
+		super.resetPlayerToSpawn(player);
     }
-
+    
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-    	
     	DocumentRelated.saveDocument(e.getPlayer());
-        AnimeCraft.instance.getDataManager().getPlayerData().remove(e.getPlayer().getUniqueId());
+        AnimeCraft.instance.getDataManager().getPlayerData().remove(e.getPlayer().getUniqueId(), Utils.getData(e.getPlayer()));
     }
 
     @EventHandler
@@ -150,6 +127,17 @@ public class Listeners extends EventListener {
     	instance.getTowerManager().currentEnemies.add(e.getEntity());
     }
     
+//    @EventHandler
+//    public void onPlay(PlayerWinEvent e) {
+//    	
+//    	Player player = e.getPlayer();
+//    	Data data = e.getData();
+//    	
+//    	data.po = 0;
+//    	super.resetPlayerToSpawn(player);
+//    	
+//    }
+    
     @EventHandler
     public void onInteractEntity(PlayerInteractAtEntityEvent e) {
     	Player player = e.getPlayer();
@@ -166,27 +154,35 @@ public class Listeners extends EventListener {
     public void onInteract(PlayerInteractEvent e) {
     	Player player = e.getPlayer();
         if (e.getItem() == null || e.getItem().getType() == Material.AIR)return;
-        if (e.getHand() != EquipmentSlot.HAND)return;
-        if (e.getItem().getType() == Material.PLAYER_HEAD) {
-        	
-    		e.setCancelled(true);
-        	switch (e.getAction()) {
-			case RIGHT_CLICK_BLOCK:
-				if (AnimeCraft.mode == 1) return;
-	    		Tower tower = instance.getTowerManager().getTowerByItemVersion(player, e.getItem());
-	    		if (tower == null)return;
-	    		tower.placeStand(player, e.getClickedBlock() == null ? player.getLocation() : e.getClickedBlock().getLocation().add(0, 2, 0));
-				return;
+        if (e.getHand() == EquipmentSlot.OFF_HAND)return;
+        if (!e.getAction().name().contains("RIGHT_CLICK"))return;
 
-			default:
-				break;
-			}
-        	
+        if (dataFrom(player).getArena() != null) {
+        	e.setCancelled(true);
         }
-        if ((e.getAction() == Action.LEFT_CLICK_BLOCK && e.getItem().getType() == Material.PLAYER_HEAD) || e.getItem().getType() == Material.MAGENTA_STAINED_GLASS_PANE) {
+        switch (e.getItem().getType()) {
+		case PLAYER_HEAD:
+    		Tower tower = instance.getTowerManager().getTowerByItemVersion(player, e.getItem());
+    		if (dataFrom(player).getArena() == null)return;
+    		if (tower == null)return;
+    		tower.placeStand(player, dataFrom(player).getArena(), e.getClickedBlock() == null ? player.getLocation() : e.getClickedBlock().getLocation().add(0.5, 2, 0.5));
+    		return;
+    		
+		case CHEST:
             dataFrom(player).towerMenu(player, false);
             e.setCancelled(true);
-        }
+			return;
+		case RED_TERRACOTTA:
+			super.callEvent(new PlayerLeftPlayEvent(player));
+			Data data = dataFrom(player);
+			if (data.play != null) {
+				data.play.getPlayers().remove(player);
+				super.resetPlayerToSpawn(player);
+			}
+			return;
+		default:
+			break;
+		}
     }
 
     @EventHandler

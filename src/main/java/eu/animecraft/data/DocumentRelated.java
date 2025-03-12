@@ -144,7 +144,7 @@ public class DocumentRelated {
         if (data.getListSelected().isEmpty()){
             List<String> list = new ArrayList<>();
             for (int i = 1; i<= 6; i++){
-                list.add("empty");
+                list.add("none");
             }
             menu.append("selection", list);
         }else{

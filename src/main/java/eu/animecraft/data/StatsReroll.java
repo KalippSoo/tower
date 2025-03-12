@@ -17,7 +17,7 @@ public class StatsReroll {
 
         double t = 0;
         if (i == 0) t=a;
-        if (i == 1) t=b;
+        if (i == 1) t=-b;
         if (i == 2) t=c;
         if (t>=20) return " &bSSS";
         if (t>=17.5) return " &bSS";

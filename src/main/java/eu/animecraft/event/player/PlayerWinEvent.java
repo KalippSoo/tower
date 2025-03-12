@@ -1,29 +1,22 @@
-package eu.animecraft.event;
+package eu.animecraft.event.player;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.Utils;
-import eu.animecraft.tower.Tower;
 
-public class TowerPlaceEvent extends Event{
+public class PlayerWinEvent extends Event{
 
-	private static HandlerList HANDLERS = new HandlerList();
+private static HandlerList HANDLERS = new HandlerList();
 	
 	private Player player;
 	private Data data;
 	
-	private Location location;
-	private Tower tower;
-	
-	public TowerPlaceEvent(Player player, Tower tower, Location loc) {
+	public PlayerWinEvent(Player player, int id) {
 		this.player = player;
 		this.data = Utils.getData(player);
-		this.tower = tower;
-		this.location = loc;
 	}
 
 	@Override
@@ -43,13 +36,5 @@ public class TowerPlaceEvent extends Event{
 
 	public Data getData() {
 		return data;
-	}
-
-	public Tower getTower() {
-		return tower;
-	}
-
-	public Location getLocation() {
-		return location;
 	}
 }

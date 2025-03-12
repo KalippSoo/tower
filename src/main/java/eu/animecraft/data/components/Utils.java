@@ -24,10 +24,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -44,6 +46,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Utils {
     public static String moneySymbol = "❇";
     public static String creditSymbol = "Ⓒ";
+    public static World world = Bukkit.getWorld("world");
     
     public static String format(double amount) {
     	
@@ -67,7 +70,12 @@ public class Utils {
         return AnimeCraft.instance.getDataManager().getPlayerData().get(player.getUniqueId());
 
     }
-
+    
+    public static ItemStack changeType(ItemStack item, Material type){
+    	item.setType(type);
+    	return item;
+    }
+    
     public static List<String> color(List<String> texts) {
         List<String> lines = new ArrayList<>();
         Iterator<?> var3 = texts.iterator();
@@ -80,6 +88,12 @@ public class Utils {
         return lines;
     }
 
+    public static String setHealth(int health) {
+    	
+		return color(" &f" + health + " &c&l❤");
+    	
+    }
+    
     public static ItemStack changeAmount(ItemStack item, int amount) {
         ItemStack newItem = item.clone();
         newItem.setAmount(amount);
@@ -118,15 +132,38 @@ public class Utils {
         item.setItemMeta(meta);
         return item;
     }
+    
+    public static ItemStack changeItemWithCurrentLore(ItemStack item, String name, String... lores) {
+        ItemMeta meta = item.getItemMeta();
+        if (name != null) {
+            meta.setDisplayName(color(name));
+        }
+
+        ArrayList<String> lines = new ArrayList<>(item.getItemMeta().getLore());
+        String[] var10 = lores;
+        int var9 = lores.length;
+
+        for(int var8 = 0; var8 < var9; ++var8) {
+            String line = var10[var8];
+            lines.add(color(line));
+        }
+
+        meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ATTRIBUTES});
+        meta.setLore(lines);
+        item.setItemMeta(meta);
+        return item;
+    }
 
     public static String stripColor(String text) {
         return ChatColor.stripColor(text);
     }
 
-    public static ItemStack book(ItemStack itemStack, String... lines) {
+    public static ItemStack book(String... lines) {
+    	ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK, 1);
         BookMeta meta = (BookMeta)itemStack.getItemMeta();
         meta.setTitle("Fishing Update");
         meta.addPage(lines);
+        meta.setAuthor("God");
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -168,12 +205,6 @@ public class Utils {
     }
 
     public static void sendMessages(Player player, String... texts) {
-        String[] var5 = texts;
-        int var4 = texts.length;
-        for(int var3 = 0; var3 < var4; ++var3) {
-            String line = var5[var3];
-            player.sendMessage(color(line));
-        }
         for(String lines : texts) {
             player.sendMessage(color(check(player, lines)));
         }
@@ -586,4 +617,9 @@ public class Utils {
     public static ItemStack createItemInstance(ItemStack item) {
         return createItem(item.getType(), item.getAmount(), item.getItemMeta().getDisplayName(), item.getItemMeta().getLore());
     }
+
+	public static void callEvent(Event event) {
+		Bukkit.getPluginManager().callEvent(event);
+		
+	}
 }

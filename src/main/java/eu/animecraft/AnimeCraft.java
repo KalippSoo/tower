@@ -12,13 +12,16 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import eu.animecraft.arena.ArenaManager;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.DataManager;
 import eu.animecraft.data.components.ConfigManager;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.group.GroupManager;
+import eu.animecraft.listerners.ArenaListener;
 import eu.animecraft.listerners.Listeners;
 import eu.animecraft.listerners.TowerListener;
+import eu.animecraft.play.PlayManager;
 import eu.animecraft.tower.TowerManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -30,6 +33,8 @@ public class AnimeCraft extends JavaPlugin {
     private TowerManager towerManager;
     private DataManager dataManager;
     private GroupManager groupManager;
+    private ArenaManager arenaManager;
+    private PlayManager playManager;
     public ConfigManager groups;
     public static int mode = 0;
 
@@ -41,14 +46,18 @@ public class AnimeCraft extends JavaPlugin {
 
     public void onEnable() {
         instance = this;
+        
         setBaseOptions();
         this.saveDefaultConfig();
+        
         this.groups = new ConfigManager(this, "", "", "groups.yml");
         this.towerManager = new TowerManager();
         this.groupManager = new GroupManager(this);
         this.dataManager = new DataManager();
-        Bukkit.getServer().getPluginManager().registerEvents(new Listeners(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new TowerListener(), this);
+        this.arenaManager = new ArenaManager();
+        this.playManager = new PlayManager();
+        
+        listeners();
 
         try {
             Field maxStackSizeField = Item.class.getDeclaredField("maxStackSize");
@@ -65,15 +74,28 @@ public class AnimeCraft extends JavaPlugin {
                 for (Player player : Bukkit.getOnlinePlayers()){
                     Data data = Utils.getData(player);
                     if (data == null)continue;
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(Utils.color("&9&lGems: &b&l"+data.gems+" &f&l| &6&lGold: &e&l"+data.gold+" &f&l| &d&lRerolls "+data.rerolls)));
+                    if (data.isPlaying()) {
+                    	player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                                TextComponent.fromLegacyText(Utils.color("&a&lMoney: &b&l"+data.po)));
+                    }else {
+                    	player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                            TextComponent.fromLegacyText(Utils.color("&9&lGems: &b&l"+data.gems+" &f&l| &6&lGold: &e&l"+data.gold+" &f&l| &5&lRerolls: &d"+data.rerolls)));
+                    }
                 }
             }
         }.runTaskTimer(this, 0, 5);
 
     }
 
-    private void setBaseOptions() {
+    private void listeners() {
+        Bukkit.getServer().getPluginManager().registerEvents(new Listeners(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new TowerListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ArenaListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(playManager, this);
+        Bukkit.getServer().getPluginManager().registerEvents(arenaManager, this);
+	}
+
+	private void setBaseOptions() {
     	Bukkit.getWorld("world").setPVP(false);
     	Bukkit.getWorld("world").setDifficulty(Difficulty.NORMAL);
         mode = this.getConfig().getInt("mode");
@@ -91,4 +113,12 @@ public class AnimeCraft extends JavaPlugin {
     public GroupManager getGroupManager() {
         return this.groupManager;
     }
+
+	public ArenaManager getArenaManager() {
+		return arenaManager;
+	}
+
+	public PlayManager getPlayManager() {
+		return playManager;
+	}
 }

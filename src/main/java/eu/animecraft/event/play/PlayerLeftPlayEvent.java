@@ -1,4 +1,4 @@
-package eu.animecraft.event;
+package eu.animecraft.event.play;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -7,24 +7,22 @@ import org.bukkit.event.HandlerList;
 
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.Utils;
+import eu.animecraft.play.Play;
 
-public class PlayerBannerDropEvent extends Event implements Cancellable{
+public class PlayerLeftPlayEvent extends Event implements Cancellable{
 
 	private static HandlerList HANDLERS = new HandlerList();
 	
+	private Play play;
 	private Player player;
 	private Data data;
-	private int count;
-	
-	private int bannerID;
 	
 	boolean cancelled = false;
 	
-	public PlayerBannerDropEvent(Player player, int count, int id) {
-		this.player = player;
-		this.data = Utils.getData(player);
-		this.bannerID = id;
-		this.count = count;
+	public PlayerLeftPlayEvent(Player player) {
+		this.player=player;
+		this.data=Utils.getData(player);
+		this.play=data.play;
 	}
 
 	@Override
@@ -36,10 +34,6 @@ public class PlayerBannerDropEvent extends Event implements Cancellable{
 	public static HandlerList getHandlerList() {
 		// TODO Auto-generated method stub
 		return HANDLERS;
-	}
-
-	public Player getPlayer() {
-		return player;
 	}
 
 	@Override
@@ -54,16 +48,16 @@ public class PlayerBannerDropEvent extends Event implements Cancellable{
 		
 	}
 
-	public int getBannerID() {
-		return bannerID;
+	public Play getPlay() {
+		return play;
 	}
 
 	public Data getData() {
 		return data;
 	}
 
-	public int getCount() {
-		return count;
+	public Player getPlayer() {
+		return player;
 	}
 	
 }

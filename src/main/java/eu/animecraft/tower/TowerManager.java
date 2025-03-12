@@ -12,17 +12,16 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
-import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.NMSClass;
 import eu.animecraft.data.components.TowerComponent;
 import eu.animecraft.data.components.Utils;
+import eu.animecraft.tower.towers.TowerBorosArmored;
+import eu.animecraft.tower.towers.TowerBorosFree;
+import eu.animecraft.tower.towers.TowerBorosLightningBurst;
 import eu.animecraft.tower.towers.TowerIchigu;
 import eu.animecraft.tower.towers.TowerItochi;
 import eu.animecraft.tower.towers.TowerNami;
@@ -37,66 +36,80 @@ public class TowerManager {
     public Map<Player, List<TowerComponent>> activeTower = new HashMap<>();
 
     public TowerManager() {
-    	
     	this.availableTower.add(new TowerItochi());
         this.availableTower.add(new TowerSonGoku());
         this.availableTower.add(new TowerIchigu());
+        //NAMI
         this.availableTower.add(new TowerNami());
         this.availableTower.add(new TowerNamiClimaStick());
+        //BOROS
+        this.availableTower.add(new TowerBorosArmored());
+        this.availableTower.add(new TowerBorosFree());
+        this.availableTower.add(new TowerBorosLightningBurst());
         
         for(int i = 0; i < 5; i++) {
         	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
             this.currentBanner.add(availableTower.get(random));
         }
         
-        new BukkitRunnable() {
-			@Override
-			public void run() {
-				for (Player players : activeTower.keySet()) {
-					for (TowerComponent tcs : activeTower.get(players)) {
-						List<Entity> removal = new ArrayList<>();
-						circleInput(players, (int) tcs.tower.fr, tcs.towers.keySet());
-						for (ArmorStand stands : tcs.towers.keySet()) {
-							int tick = tcs.towers.get(stands);
-							
-							if (tick > 0) {
-								tick--;
-							}else {
-								tick = (int) (tcs.tower.fc);
-								
-								Iterator<Entity> entities = currentEnemies.iterator();
-								while (entities.hasNext()) {
-									Entity entity = entities.next();
-									LivingEntity target = ((LivingEntity)entity);
-									double
-									x1 = stands.getLocation().getX(),
-									x2 = entity.getLocation().getX(),
-									z1 = stands.getLocation().getZ(),
-									z2 = entity.getLocation().getZ(),
-									y1 = stands.getLocation().getZ(),
-									y2 = entity.getLocation().getZ();
-									
-									double distance = calculateDistanceBetweenPoints(x1, z1, y1, x2, z2, y2);
-									if (distance > tcs.tower.fr)continue;
-									
-									
-									target.damage(tcs.tower.fd);
-									if (target.isDead()) {
-										removal.add(target);
-									}
-								}
-								currentEnemies.removeAll(removal);
-								stands.setVelocity(new Vector(0, 2, 0).multiply(0.2f));
-							}
-							tcs.towers.put(stands, tick);
-						}
-					}
-				}
-			}
-		}.runTaskTimer(AnimeCraft.instance, 0, 0);
+//        new BukkitRunnable() {
+//			@Override
+//			public void run() {
+//				for (Player players : activeTower.keySet()) {
+//					for (TowerComponent tcs : activeTower.get(players)) {
+//						List<Entity> removal = new ArrayList<>();
+//						circleInput(players, (int) tcs.tower.fr, tcs.towers.keySet());
+//						for (ArmorStand stands : tcs.towers.keySet()) {
+//							int tick = tcs.towers.get(stands);
+//							
+//							if (tick > 0) {
+//								tick--;
+//							}else {
+//								if (currentEnemies.isEmpty()) return;
+//								tick = (int) (tcs.tower.fc);
+//								Iterator<Entity> entities = currentEnemies.iterator();
+//								while (entities.hasNext()) {
+//									Entity entity = entities.next();
+//									LivingEntity target = ((LivingEntity)entity);
+//									double
+//									x1 = stands.getLocation().getX(),
+//									x2 = entity.getLocation().getX(),
+//									z1 = stands.getLocation().getZ(),
+//									z2 = entity.getLocation().getZ(),
+//									y1 = stands.getLocation().getY(),
+//									y2 = entity.getLocation().getY();
+//									
+//									double distance = calculateDistanceBetweenPoints(x1, z1, y1, x2, z2, y2);
+//									if (distance > tcs.tower.fr)continue;
+//									
+//									target.damage(tcs.tower.fd);
+//									if (target.isDead()) {
+//										removal.add(target);
+//									}
+//									
+//									Bukkit.getPluginManager().callEvent(new TowerHittingTargetEvent(tcs.tower, target));
+//									
+//								    Vector direction = stands.getLocation().toVector().subtract(target.getEyeLocation().toVector()).normalize();
+//								    double x = direction.getX();
+//								    double y = direction.getY();
+//								    double z = direction.getZ();
+//									
+//								    Location changed = stands.getLocation().clone();
+//								    changed.setYaw(180 - toDegree(Math.atan2(x, z)));
+//								    changed.setPitch(90 - toDegree(Math.acos(y)));
+//								    stands.teleport(changed);
+//									
+//								}
+//							}
+//							tcs.towers.put(stands, tick);
+//						}
+//					}
+//				}
+//			}
+//		}.runTaskTimer(AnimeCraft.instance, 0, 0);
         
     }
-
+    
     public static List<Location> generateSphere(Location centerBlock, int radius, boolean hollow) {
         
         List<Location> circleBlocks = new ArrayList<Location>();
@@ -186,14 +199,25 @@ public class TowerManager {
         }
         return null;
     }
-
+    
+    public int getPlacementInSelectedArray(Data data, String uuid) {
+    	int count = 0;
+    	for (String string : data.getListSelected()) {
+    		if (string.equals(uuid)) {
+    			break;
+    		}
+    		count++;
+    	}
+    	return count;
+    }
+    
     public Tower getTowerByItemVersion(Player player, ItemStack item) {
     	Data data = Utils.getData(player);
         Iterator<?> var4 = data.getTowers().iterator();
 
         while(var4.hasNext()) {
             Tower towers = (Tower)var4.next();
-            if (isSimilar(towers.getItemVersion(0), item)) {
+            if (isSimilar(towers.towerItem, item)) {
                 return towers;
             }
         }
@@ -202,7 +226,7 @@ public class TowerManager {
     }
     
     private boolean isSimilar(ItemStack original, ItemStack item) {
-    	return original.getAmount() == item.getAmount() && 
+    	return 
     			original.getItemMeta().getDisplayName().equals(item.getItemMeta().getDisplayName()) && 
     			original.getItemMeta().getLore().get(0).equals(item.getItemMeta().getLore().get(0)) && 
     				original.getItemMeta().getLore().get(1).equals(item.getItemMeta().getLore().get(1)) &&

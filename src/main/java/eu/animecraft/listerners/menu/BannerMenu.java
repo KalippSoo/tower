@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
-import eu.animecraft.event.PlayerBannerDropEvent;
+import eu.animecraft.event.banner.PlayerBannerDropEvent;
 
 public class BannerMenu extends Menu {
     int[] towerLocation = new int[]{12, 13, 14, 21, 22, 23};
@@ -72,7 +72,7 @@ public class BannerMenu extends Menu {
         }
 
         for(i = 0; i < this.towerLocation.length; ++i) {
-            this.getInventory().setItem(this.towerLocation[i], AnimeCraft.instance.getTowerManager().availableTower.get(ThreadLocalRandom.current().nextInt(AnimeCraft.instance.getTowerManager().availableTower.size())).getItemVersion(1));
+            this.getInventory().setItem(this.towerLocation[i], AnimeCraft.instance.getTowerManager().availableTower.get(ThreadLocalRandom.current().nextInt(AnimeCraft.instance.getTowerManager().availableTower.size())).towerItem);
         }
 
         this.getInventory().setItem(16, Utils.createItem(Material.LAPIS_LAZULI, 1, "&9Gems: &d" + this.instance.getDataManager().getPlayerData().get(this.getPlayer().getUniqueId()).gems));

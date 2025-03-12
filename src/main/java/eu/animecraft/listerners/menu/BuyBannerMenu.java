@@ -61,7 +61,7 @@ public class BuyBannerMenu extends Menu{
 				
 				if (size < tower.size()) {
 					
-					getInventory().addItem(tower.get(size).getItemVersion(0));
+					getInventory().addItem(tower.get(size).towerItem);
 					if (tower.get(size).getRarity().ordinal()>=3) {
 						getPlayer().playSound(getPlayer().getEyeLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 2f);
 					}else {

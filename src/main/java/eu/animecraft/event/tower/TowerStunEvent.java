@@ -1,9 +1,9 @@
-package eu.animecraft.event;
+package eu.animecraft.event.tower;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class TowerRemoveEvent extends Event{
+public class TowerStunEvent extends Event{
 
 	private static HandlerList HANDLERS = new HandlerList();
 	
