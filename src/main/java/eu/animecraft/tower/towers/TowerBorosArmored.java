@@ -15,7 +15,7 @@ public class TowerBorosArmored extends Tower{
 						+ "JzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB"
 						+ "7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTVk"
 						+ "OGRlMTk0MDViZjVjYTI5MWQxNzk5NGNjZDk2NGI4ZDc1MmE1ZWEzNDQ4NWE3ZjUyODBiNGYxNjRhM"
-						+ "ThiMyIKICAgIH0KICB9Cn0=", null);
+						+ "ThiMyIKICAgIH0KICB9Cn0=", null, AttackType.SINGLE);
         this.damage = 150;
         this.cooldown = 19;
         this.range = 15;

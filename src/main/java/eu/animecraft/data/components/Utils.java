@@ -41,6 +41,11 @@ import com.google.gson.JsonParser;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
+import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.towers.TowerBorosArmored;
+import eu.animecraft.tower.towers.TowerBorosFree;
+import eu.animecraft.tower.towers.TowerBorosLightningBurst;
+import eu.animecraft.tower.towers.TowerNamiClimaStick;
 import net.md_5.bungee.api.ChatColor;
 
 public class Utils {
@@ -621,5 +626,24 @@ public class Utils {
 	public static void callEvent(Event event) {
 		Bukkit.getPluginManager().callEvent(event);
 		
+	}
+
+	public static Tower getEvolved(int id) {
+		
+		Tower evo = null;
+		
+		switch (id) {
+		case 1574:
+			evo = new TowerBorosFree();
+			break;
+		case 2455:
+			evo = new TowerBorosLightningBurst();
+			break;
+		case 4574:
+			evo = new TowerNamiClimaStick();
+			break;
+		}
+		
+		return evo;
 	}
 }

@@ -14,7 +14,7 @@ public class PathfinderGoalTower extends PathfinderGoal{
 
 	private final EntityInsentient a; //Creature
 	private final Arena region; //Get the region
-	private List<Location> locations = new ArrayList<>();
+	public List<Location> locations = new ArrayList<>();
 	
 	private final double f; //Speed
 	private double c;
@@ -56,7 +56,7 @@ public class PathfinderGoalTower extends PathfinderGoal{
 	
 	public void c() {
 		
-		if (this.a.getBukkitEntity().getLocation().distance(this.locations.get(0)) < 4) {
+		if (this.a.getBukkitEntity().getLocation().distance(this.locations.get(0)) < 3) {
 			this.locations.remove(0);
 		}
 		

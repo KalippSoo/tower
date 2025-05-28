@@ -1,11 +1,12 @@
 package eu.animecraft.arena;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -30,16 +31,21 @@ public class Arena {
 	public Location tp;
 	public int health = 20;
 	public List<Player> players = new ArrayList<>();
-	public List<Entity> enemies = new ArrayList<>();
+	public Map<Entity, EnemyCustom> enemies = new HashMap<>();
 	public List<EnemyCustom> queue = new ArrayList<>();
 	public List<Location> paths = new ArrayList<>();
+	
+	private int act=0;
+	private int[] bonusHealthAct = {0, 50, 100, 150, 200, 250};
 	
 	private Arena arena;
 	
 	//GAMEPLAY RELATED
 	boolean a = false;
 	int wave = 0;
-	public int timeout = 600;
+	
+	int valueTimeOut = 10;
+	public int timeout = valueTimeOut;
 	
 	public ItemStack itemStack;
 	
@@ -60,18 +66,23 @@ public class Arena {
 		this.arena = this;
 	}
 	
-	public void decreaseTimeout() {
-		if (!isBusy) {
-			timeout--;
-		}else if (isBusy && timeout<600) {
-			timeout=600;
-		}
-		if (!isBusy&&timeout<=0) {
-			for (Block block : bound.getCopy()) {
-				block.setType(Material.AIR);
-			}
-		}
+	public Arena(int id, String name, ItemStack display, Location teleport, Location min, Location max, List<Location> paths) {
+		this.arena = this;
 		
+		this.id = id;
+		this.name = name;
+		this.rawName=Utils.stripColor(name);
+		
+		this.itemStack = display;
+		
+		this.bound.setMin(min);
+		this.bound.setMax(max);
+		this.bound.assignCorrectBound();
+		this.tp = teleport;
+		
+		this.paths = paths;
+
+		ArenaManager.currentArenas.put(id, new ArrayList<>());
 	}
 	
 	public void reset() {
@@ -86,10 +97,11 @@ public class Arena {
 			}
 			Data data = Utils.getData(players);
 			data.setArena(null);
+			data.po = 0;
 		}
 		
-		this.enemies.forEach(entities->entities.remove());
-
+		this.enemies.keySet().forEach(entities->entities.remove());
+		
 		this.wave = 0;
 		this.enemies.clear();
 		this.players.clear();
@@ -97,15 +109,19 @@ public class Arena {
 	}
 	
 	public void spawnCurrentWave() {
+		
 		new BukkitRunnable() {
-			
+			int autoSkip = 10;
 			@Override
 			public void run() {
 				if (!a)return;
-				if (queue.isEmpty() && wave < 10) {
+				if (wave < 10 && queue.isEmpty() && (autoSkip == 0 || enemies.isEmpty())) {
 					newWave();
 					cancel();
 					return;
+				}
+				if (wave < 10 && queue.isEmpty()) {
+					autoSkip--;
 				}
 				
 				if (wave == 10) {
@@ -133,7 +149,7 @@ public class Arena {
 		//Wait 5 seconds before the new wave start !
 		a=false;
 		wave++;
-		queue = new ArrayList<EnemyCustom>(MobList.Namek_ACT1(this, wave));
+		queue = new ArrayList<EnemyCustom>(MobList.getMobsLinkToAct(this, wave));
 		Bukkit.getPluginManager().callEvent(new ArenaNewWaveEvent(this, wave));
 	}
 	
@@ -155,6 +171,15 @@ public class Arena {
 			bloc.setBlockData(block.getBlockData());
 		}
 		
+	}
+	public int getAct() {
+		return act;
+	}
+	public void setAct(int act) {
+		this.act = act;
+	}
+	public int[] getBonusHealthAct() {
+		return bonusHealthAct;
 	}
 	
 }

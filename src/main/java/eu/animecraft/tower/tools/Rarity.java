@@ -2,6 +2,7 @@ package eu.animecraft.tower.tools;
 
 import java.awt.Color;
 
+import eu.animecraft.tower.Tower;
 import net.md_5.bungee.api.ChatColor;
 
 public enum Rarity {
@@ -31,5 +32,22 @@ public enum Rarity {
 
     public ChatColor getColor() {
         return this.color;
+    }
+    
+    public static int getGold(Tower tower) {
+    	return getGold(tower.getRarity());
+    }
+    
+    public static int getGold(Rarity rarity) {
+    	switch (rarity) {
+		case COMMON: return 1000;
+		case RARE: return 3000;
+		case EPIC: return 7500;
+		case LEGENDARY: return 10000;
+		case MYTHIC: return 15000;
+		case SECRET: return 20000;
+		case LIMITED: return 25000;
+		}
+		return 0;
     }
 }

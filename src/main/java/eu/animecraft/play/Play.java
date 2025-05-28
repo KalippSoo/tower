@@ -14,12 +14,13 @@ public class Play {
 
 	public boolean isActivated = false;
 	private Location location, front;
-	private int mode = -1;
+	private int mode = 1;
+	private int actMode = 0;
 	
 	private Player owner = null;
 	private List<Player> players= new ArrayList<>();
 	
-	private int maxSeconds = 20; 
+	private int maxSeconds = 3000; 
 	public int current = maxSeconds;
 	public int maxPlayers = 4;
 	
@@ -28,7 +29,7 @@ public class Play {
 	
 	public Play(Location location, int... offsets) {
 		this.location = location;
-		this.front = location.clone().add(offsets[0], 0 , offsets[1]);
+		this.front = location.clone().add(offsets[0], 0, offsets[1]);
 		this.stand = location.getWorld().spawn(front, ArmorStand.class, stands -> {
 			stands.setVisible(false);
 			stands.setCustomNameVisible(true);
@@ -53,6 +54,8 @@ public class Play {
 		this.stand.setCustomName("Waiting...");
 		this.current=maxSeconds;
 		this.getPlayers().clear();
+		this.setOwner(null);
+		this.setActMode(0);
 	}
 	
 	public int getMode() {
@@ -97,6 +100,14 @@ public class Play {
 
 	public ArmorStand getAct() {
 		return act;
+	}
+
+	public int getActMode() {
+		return actMode;
+	}
+
+	public void setActMode(int actMode) {
+		this.actMode = actMode;
 	}
 	
 }

@@ -8,8 +8,10 @@ public class Reward {
 	private int playerExp = 500;
 	private int gems = ThreadLocalRandom.current().nextInt(40, 80);
 	
-	public Reward() {
-		
+	public Arena arena;
+	
+	public Reward(Arena arena) {
+		this.arena = arena;
 	}
 	
 	public int getRerolls() {

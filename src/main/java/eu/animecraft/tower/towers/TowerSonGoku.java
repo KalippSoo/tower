@@ -19,11 +19,10 @@ public class TowerSonGoku extends Tower {
                         "YWFlYmQwNGUyOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJZdW5hbWkyNyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6" +
                         "IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1" +
                         "cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS83ZjllZWM2Zjc5MTk4N2NlNWQzNDQxZDZlYTdiMjk1YjY5NDVkZTE2" +
-                        "ZjlhNTMzOTZiN2M5ZWJmMTVmMjY2MTZjIgogICAgfQogIH0KfQ==");
+                        "ZjlhNTMzOTZiN2M5ZWJmMTVmMjY2MTZjIgogICAgfQogIH0KfQ==", AttackType.SINGLE);
         this.damage = 30;
-        this.cooldown = 120;
+        this.cooldown = 20;
         this.range = 7;
         this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.LIGHT};
-        
     }
 }

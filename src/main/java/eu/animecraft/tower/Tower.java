@@ -11,12 +11,15 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import eu.animecraft.AnimeCraft;
 import eu.animecraft.MyArmorStand;
 import eu.animecraft.arena.Arena;
+import eu.animecraft.arena.SoundTower;
 import eu.animecraft.data.Lvl;
 import eu.animecraft.data.StatsReroll;
 import eu.animecraft.data.components.SkullCreator;
@@ -26,7 +29,7 @@ import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
 import eu.animecraft.tower.tools.Trait;
 
-public class Tower{
+public class Tower extends Passive{
 	
     private int count;
     private int maxCount;
@@ -36,20 +39,21 @@ public class Tower{
     private Trait trait = Trait.none;
     private int id;
     private boolean shiny;
+    public Sound sound;
     /*
     Just write manually the damage, cooldown and the range with the leveling system create a new instance.
      */
     public Tower evo = null;
     public DamageType[] damageTypes;
     public int damage, cooldown, range, critChance;
+    public AttackType attackType;
     public double fd, fr;
     public int fc;
     public boolean locked;
-    public StatsReroll statsReroll = new StatsReroll(0,0,0);
-    public Lvl lvlSystem = new Lvl(this);
+    public StatsReroll statsReroll;
+    public Lvl lvlSystem;
     public UUID uuid;
     public MyArmorStand stand;
-    
     
     //parameters
     public int currentCooldown = 0;
@@ -61,23 +65,13 @@ public class Tower{
     public String sValue;
     public String sSignature;
     
-    public Tower(int id, Rarity rarity, String name, Player owner, boolean shiny, int maxCount, UUID uuid, String value, String sValue) {
-        this.id = id;
-        this.rarity = rarity;
-        this.name = name;
-        this.owner = owner;
-        this.shiny = shiny;
-        this.maxCount = maxCount;
-        //Classic head
-        this.value = value;
-        //Shiny head
-        this.sValue = sValue;
-        updateStats();
+    public Tower(int id, Rarity rarity, String name, Player owner, boolean shiny, int maxCount, UUID uuid, String value, String sValue, AttackType attackType) {
+    	this(uuid, 0, 0, 0, shiny, null, id, null, null, Trait.none, rarity, maxCount, value, sValue, name, false, null, attackType);
         
     }
     
     public Tower(UUID uuid, int damage, int cooldown, int range, boolean shiny, Player owner, int id, Lvl lvlSytem, StatsReroll statsReroll, 
-    		Trait trait, Rarity rarity, int maxPlacement, String value, String sValue, String name, boolean locked) {
+    		Trait trait, Rarity rarity, int maxPlacement, String value, String sValue, String name, boolean locked, Tower evo, AttackType attackType) {
     	this.uuid = uuid;
     	this.damage = damage;
     	this.cooldown = cooldown;
@@ -85,22 +79,26 @@ public class Tower{
     	this.shiny = shiny;
     	this.owner = owner;
     	this.id = id;
-    	this.lvlSystem = lvlSytem;
-    	this.statsReroll = statsReroll;
+    	this.lvlSystem = lvlSytem == null ? new Lvl(this): lvlSytem;
+    	this.statsReroll = statsReroll == null ? new StatsReroll(0, 0, 0): statsReroll;
     	this.rarity = rarity;
     	this.value = value;
     	this.sValue = sValue;
     	this.locked = locked;
     	this.maxCount = maxPlacement;
     	this.name = name;
+    	this.evo = evo;
+    	this.attackType = attackType;
     	this.setTrait(trait);
     	setShiny(shiny);
     	updateStats();
-    	
+    	sound = SoundTower.getSound(id);
+    	attackType = TowerAttack.getType(id);
+    	AnimeCraft.instance.getTowerManager().availableTower.add(this);
     }
     
     public Tower clone() {
-        Tower tower = new Tower(id, rarity, name, owner, shiny, maxCount, uuid, value, sValue);
+        Tower tower = new Tower(id, rarity, name, owner, shiny, maxCount, uuid, value, sValue, attackType);
         tower.uuid = UUID.randomUUID();
         tower.damage = damage;
         tower.cooldown = cooldown;
@@ -116,7 +114,10 @@ public class Tower{
         tower.locked = locked;
         tower.maxCount = maxCount;
         tower.name = name;
+        tower.attackType = attackType;
+        tower.trait=trait;
     	tower.updateStats();
+    	tower.sound = SoundTower.getSound(id);
         return tower;
 
     }
@@ -134,6 +135,17 @@ public class Tower{
         updateStats();
     }
     
+    public Tower transferStats() {
+    	
+    	Tower clone = AnimeCraft.instance.getTowerManager().getTower(this.evo.getId()).clone();
+    	clone.setTrait(trait);
+    	clone.statsReroll = this.statsReroll;
+    	clone.setOwner(owner);
+    	clone.updateStats();
+    	
+    	return clone;
+    }
+    
     public void updateStats(){
     	
         double td = 0, tc = 0, tr = 0;
@@ -149,6 +161,7 @@ public class Tower{
             case STAR: td = 30; tc = -15; tr = 10;break;
             case PARTICULAR: td = -15; tc = -65;break;
             case UNIQUE: td = 400; tc = -25; tr = 20;break;
+            case DIVINE: td = 750; tc = -15; tr = 10;break;
         }
         double bd = (lvlSystem.getDamage() + statsReroll.a), bc = (cooldown-statsReroll.b), br = (range + statsReroll.c);
         this.fd = (bd + ((bd*td)/100)) + (shiny ? ((damage*15)/100) : 0);
@@ -179,10 +192,24 @@ public class Tower{
         lines.add(Utils.color("&7Damage: &c" + Math.round(fd) +" &f&l/"+ statsReroll.d(0)));
         lines.add(Utils.color("&7Reload: &a" + format(fc / 20.0F) + "s "+" &f&l/"+ statsReroll.d(1)));
         lines.add(Utils.color("&7Range: &e" + format(fr) +" &f&l/"+ statsReroll.d(2)));
+        lines.add("");
         if (trait != null && trait != Trait.none)
         	lines.add(Utils.color("&7Trait: "+trait.getRarity().getColor()+trait.name()));
+    	lines.add(Utils.color("&7Attack Type: &e"+attackType.name()));
         lines.add("");
         lines.add(Utils.color("&7Locked: " + (this.locked?"&a&lON":"&f&lOFF")));
+        if (!passive(this).isEmpty()) {
+            lines.add("");
+            lines.add(Utils.color("&7Passive:"));
+            lines.addAll(Utils.color(passive(this)));
+        }
+        lines.add("");
+        if (this.evo != null) {
+            lines.add(Utils.color("&7Can be evolved to:"));
+            lines.add(Utils.color(evo.displayName()));
+        }else {
+            lines.add(Utils.color("&7Cannot be evolved anymore"));
+        }
         
         lines.add("");
         lines.add(Utils.color(this.getRarity().getName()));

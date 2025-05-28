@@ -3,6 +3,7 @@ package eu.animecraft.tower.tools;
 import java.util.concurrent.ThreadLocalRandom;
 
 public enum Trait {
+    DIVINE(0.05, Rarity.MYTHIC),
     UNIQUE(0.1, Rarity.MYTHIC),
     PARTICULAR(0.25, Rarity.MYTHIC),
     STAR(0.5, Rarity.MYTHIC),

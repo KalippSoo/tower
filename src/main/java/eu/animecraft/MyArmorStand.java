@@ -29,7 +29,7 @@ public class MyArmorStand extends EntityArmorStand{
 
 	Tower tower;
 	Location location;
-	int maxReload, currentReload;
+	int currentReload;
 	Entity stands;
 	//ArmorStand stats;
 	public Arena arena;
@@ -39,7 +39,6 @@ public class MyArmorStand extends EntityArmorStand{
 		setPosition(location.getX(), location.getY(), location.getZ());
 		this.tower = tower;
 		this.location = location;
-		this.maxReload = (int) tower.fc;
 		this.currentReload = 0;
 		this.arena = arena;
 		this.persist = true;
@@ -59,6 +58,7 @@ public class MyArmorStand extends EntityArmorStand{
 	}
 	
 	List<Entity> enemies = AnimeCraft.instance.getTowerManager().currentEnemies;
+	List<LivingEntity> targets = new ArrayList<LivingEntity>();
 	
 	public void tick() {
 		super.tick();
@@ -87,11 +87,12 @@ public class MyArmorStand extends EntityArmorStand{
 				if (distance > tower.fr)continue;
 
 				find = true;
-				Bukkit.getPluginManager().callEvent(new TowerHittingTargetEvent(tower, target, this));
-				
+				targets.add(target);
 			}
-			if (find)
-				currentReload = maxReload;
+			if (find) {
+				currentReload = tower.fc;
+				Bukkit.getPluginManager().callEvent(new TowerHittingTargetEvent(tower, arena, targets, this));
+			}
 		}
 	}
 	

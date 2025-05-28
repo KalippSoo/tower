@@ -13,10 +13,16 @@ import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.components.ScrollMenu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.tower.Tower;
+import eu.animecraft.tower.tools.Rarity;
 
 public class TowerMenu extends ScrollMenu {
-    public TowerMenu(boolean rerollMenu) {
-        this.rerollMenu = rerollMenu;
+	/*
+	 * 0 rerolls
+	 * 1 evolution
+	 * 
+	 */
+    public TowerMenu(int mode) {
+        this.mode = mode;
         this.maxItemInPage = 24;
     }
 
@@ -26,7 +32,11 @@ public class TowerMenu extends ScrollMenu {
 
     public int size() { return 54; }
 
-    public boolean rerollMenu;
+    public int mode;
+    public boolean Mode(int mode) {
+    	return (this.mode == mode);
+    }
+    
     int preset = 27;
     
     public boolean isSelling = false;
@@ -44,10 +54,19 @@ public class TowerMenu extends ScrollMenu {
             if (targetTower == null)return;
             
             /*
-             * z
+             * 
              */
-            if (rerollMenu){
+            if (Mode(0)){
                 RerollMenu menu = new RerollMenu(targetTower);
+                menu.set(getPlayer());
+                return;
+            }
+            if (Mode(1)){
+            	if (targetTower.evo == null) {
+            		Utils.sendMessages(getPlayer(), "&cThis tower has no evolution !");
+            		return;
+            	}
+                EvolutionMenu menu = new EvolutionMenu(targetTower);
                 menu.set(getPlayer());
                 return;
             }
@@ -113,7 +132,12 @@ public class TowerMenu extends ScrollMenu {
         				Utils.sendMessages(getPlayer(), "&aYou cancelled all your sellings !");
         			}else if (e.getClick()==ClickType.LEFT) {
                 		getData().getTowers().removeAll(sellingTowers);
-                		Utils.sendMessages(getPlayer(), "&aYou sold " + sellingTowers.size() + " units !");
+                		sellingTowers.forEach(tower -> {
+                			int amount = (Rarity.getGold(tower.getRarity())/10);
+                			getData().gold += amount;
+                			Utils.sendMessages(getPlayer(), "&fYou sold " + tower.displayName() + " &ffor &e&l" + amount + "gold &f!");
+                		});
+                		Utils.sendMessages(getPlayer(), "&fYou sold " + sellingTowers.size() + " units !");
         			}
             		sellingTowers.clear();
         		}
@@ -141,14 +165,14 @@ public class TowerMenu extends ScrollMenu {
         	break;
 	default:
 		break;
-    }
+    	}
         
     }
 
     public void setMenuItems() {
         // 17 26 35 44
         int[] pane = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 16, 17, 18, 25, 26, 27, 34, 35, 36, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53};
-        if (rerollMenu && isSelling)isSelling=!isSelling;
+        if (Mode(0) && isSelling)isSelling=!isSelling;
         
         /*
          * Change pane color if selling mode is ON
@@ -160,7 +184,7 @@ public class TowerMenu extends ScrollMenu {
             getInventory().setItem(8, Utils.createItem(Material.ARROW, 1, "&7En haut"));
         getInventory().setItem(53, Utils.createItem(Material.ARROW, 1, "&7En bas"));
 	
-        if (!rerollMenu){
+        if (!Mode(0)){
             this.getInventory().setItem(17, Utils.createItem(Material.RED_DYE, 1, "&4&lUnequip all"));
             this.getInventory().setItem(26, Utils.createItem(Material.GOLD_INGOT, 1, "&f&lSell: "+((isSelling) ? "&a&lON" : "&c&lOFF")
             		, "", "&e&lRIGHT CLICK TO CANCEL", "&e&lLEFT CLICK TO CONFIRM"));
@@ -174,17 +198,19 @@ public class TowerMenu extends ScrollMenu {
             for (Tower towers : getData().getTowers()){
                 if (!towers.uuid.toString().equals(towersUUID))continue;
                 uuids.add(towersUUID);
-                if (rerollMenu)continue;
+                if (Mode(0))continue;
                 ItemStack stack = towers.towerItem.clone();
                 ItemMeta meta = stack.getItemMeta();
                 meta.setDisplayName(Utils.color(meta.getDisplayName()));
                 List<String> lines = new ArrayList<>(meta.getLore());
-                if (!(lines.size() > 8)) {
-                    lines.add(Utils.color(""));
-                    lines.add(Utils.color("&a&lEQUIPED"));
-                }
+                
+                lines.add(Utils.color(""));
+                lines.add(Utils.color("&a&lEQUIPED"));
+                
                 meta.setLore(lines);
                 stack.setItemMeta(meta);
+            	if (isSelling) 
+            		Utils.changeType(stack, Material.BARRIER);
                 this.getInventory().addItem(new ItemStack[]{stack});
 
             }

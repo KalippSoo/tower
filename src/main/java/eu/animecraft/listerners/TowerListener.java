@@ -20,6 +20,7 @@ import eu.animecraft.event.banner.PlayerBannerDropEvent;
 import eu.animecraft.event.tower.TowerHittingTargetEvent;
 import eu.animecraft.event.tower.TowerPlaceEvent;
 import eu.animecraft.listerners.menu.BuyBannerMenu;
+import eu.animecraft.tower.Passive.AttackType;
 import eu.animecraft.tower.Tower;
 
 public class TowerListener extends EventListener{
@@ -53,28 +54,35 @@ public class TowerListener extends EventListener{
 	@EventHandler
 	public void onTowerHitTarget(TowerHittingTargetEvent e) {
 		Tower tower = e.getTower();
-		LivingEntity entity = e.getEntity();
-		ArmorStand en = (ArmorStand) e.getArmorStand().getBukkitEntity();
 		Arena arena = e.getArmorStand().arena;
 		
-	    Vector direction = en.getLocation().toVector().subtract(entity.getEyeLocation().toVector()).normalize();
-	    double x = direction.getX();
-	    double y = direction.getY();
-	    double z = direction.getZ();
+		List<LivingEntity> targets = AttackType.getTargets(tower, arena, e.getEntities());
 		
-	    Location changed = en.getLocation().clone();
-	    changed.setYaw(180 - toDegree(Math.atan2(x, z)));
-	    changed.setPitch(90 - toDegree(Math.acos(y)));
-		en.teleport(changed);
-		
-		if (tower.fd >= entity.getHealth()) {
-			arena.enemies.remove(entity);
-			arena.players.forEach(player->Utils.getData(player).po+=45);
+		for (LivingEntity entities : targets) {
+
+			LivingEntity entity = entities;
+			ArmorStand en = (ArmorStand) e.getArmorStand().getBukkitEntity();
+			
+		    Vector direction = en.getLocation().toVector().subtract(entity.getEyeLocation().toVector()).normalize();
+		    double x = direction.getX();
+		    double y = direction.getY();
+		    double z = direction.getZ();
+			
+		    Location changed = en.getLocation().clone();
+		    changed.setYaw(180 - toDegree(Math.atan2(x, z)));
+		    changed.setPitch(90 - toDegree(Math.acos(y)));
+			en.teleport(changed);
+			
+			if (tower.fd >= entity.getHealth() && arena.enemies.containsKey(entity)) {
+				arena.enemies.remove(entity);
+				arena.players.forEach(player->Utils.getData(player).po+=45);
+			}
+			entity.damage(tower.fd);
+			tower.lvlSystem.addExp(entity.getHealth());
+			en.getWorld().playSound(en.getLocation(), tower.sound, 1f, 1f);
+			tower.passive(tower, entity);
 		}
-		entity.damage(tower.fd);
-		tower.lvlSystem.addExp(e.getEntity().getHealth());
-		
-		
+
 	}
 	
 	private float toDegree(double angle) {
@@ -104,7 +112,6 @@ public class TowerListener extends EventListener{
             tower.setOwner(player);
             data.getTowers().add(tower);
         }
-        data.rerolls += 15;
         BuyBannerMenu menu = new BuyBannerMenu(towers);
         menu.set(player);
 	}

@@ -16,7 +16,7 @@ public class TowerBorosFree extends Tower{
 				+ "CJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZX"
 				+ "QvdGV4dHVyZS80NjgxMWU2MTgyOTUzNTQyMjVmMTZlZDBiNDQ4YzUxMjk1YWNhZDBkNTk1NTI"
 				+ "1NjFkMDkxOTI4NDU3YzhiYjBiIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9k"
-				+ "ZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=", null);
+				+ "ZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=", null, AttackType.SINGLE);
         this.damage = 340;
         this.cooldown = 48;
         this.range = 20;

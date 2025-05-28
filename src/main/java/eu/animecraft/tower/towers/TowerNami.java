@@ -23,8 +23,8 @@ public class TowerNami extends Tower{
 				+ "AgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm"
 				+ "5ldC90ZXh0dXJlLzQ5NjI2ZGI4YzNkYjAxOGZmNGIxNGUwNjRiODZlYmE0NDU3MWM0ZGUxMz"
 				+ "Y0MzJmZTY5MGFjZmU0Njc5ZTMxZjciLAogICAgICAibWV0YWRhdGEiIDogewogICAgICAgIC"
-				+ "Jtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ==");
-        this.damage = 38;
+				+ "Jtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ==", AttackType.SINGLE);
+        this.damage = 120;
         this.cooldown = 240;
         this.range = 15;
         this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.WIND};

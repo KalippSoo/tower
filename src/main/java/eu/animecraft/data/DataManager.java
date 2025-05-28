@@ -43,12 +43,17 @@ public class DataManager {
             }
 			break;
 		case 1:
-			for (int i1 = 0; i1<8;i1++) {
-		        player.getInventory().setItem(i1, Utils.createItem(Material.RED_TERRACOTTA, 1, "&c&lCLICK TO LEAVE"));
-			}
+	        i = 3;
+            for (String uuids : data.getListSelected()){
+            	Tower tower = instance.getTowerManager().getTowerByUUID(data, uuids);
+                if (tower != null)
+                	player.getInventory().setItem(i, tower.towerItem.clone());
+                i++;
+            }
+			player.getInventory().setItem(0, Utils.createItem(Material.RED_TERRACOTTA, 1, "&c&lCLICK TO LEAVE"));
 			break;
 		case 2:
-	        i = 1;
+	        i = 2;
             for (String uuids : data.getListSelected()){
             	Tower tower = instance.getTowerManager().getTowerByUUID(data, uuids);
                 if (tower != null)

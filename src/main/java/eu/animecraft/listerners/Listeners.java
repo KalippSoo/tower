@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Cat;
@@ -13,17 +14,25 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import eu.animecraft.AnimeCraft;
+import eu.animecraft.arena.Arena;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.DataManager;
 import eu.animecraft.data.DocumentRelated;
@@ -33,9 +42,9 @@ import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.play.PlayerLeftPlayEvent;
-import eu.animecraft.event.player.PlayerWinEvent;
 import eu.animecraft.listerners.menu.BannerMenu;
-import eu.animecraft.listerners.menu.RewardsMenu;
+import eu.animecraft.listerners.menu.TeleportationMenu;
+import eu.animecraft.listerners.menu.TowerMenu;
 import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.Trait;
 
@@ -45,6 +54,7 @@ public class Listeners extends EventListener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         player.getInventory().clear();
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255, false, false));
         if (!AnimeCraft.instance.getDataManager().getPlayerData().containsKey(e.getPlayer().getUniqueId())) {
             AnimeCraft.instance.getDataManager().getPlayerData().put(e.getPlayer().getUniqueId(), new Data());
         }
@@ -61,8 +71,10 @@ public class Listeners extends EventListener {
         }
 
         Document stats = DocumentRelated.getSpecificDocument(player, "stats");
+        Document collection = DocumentRelated.getSpecificDocument(player, "collection");
         Document inventory = DocumentRelated.getSpecificDocument(player, "inventory");
 
+        Iterator<String> collections = collection.getList("contents", String.class).iterator();
         Iterator<String> towers = inventory.getList("contents", String.class).iterator();
 
         while(towers.hasNext()){
@@ -87,7 +99,7 @@ public class Listeners extends EventListener {
             Tower tower = new Tower(uuid, targetTower.damage, targetTower.cooldown, targetTower.range,
             		shiny, player, id, lvlSystem, new StatsReroll(a,b,c), trait, targetTower.getRarity(),
             		targetTower.getMaxCount(), targetTower.value, targetTower.sValue, targetTower.getName(),
-            		locked);
+            		locked, Utils.getEvolved(id), targetTower.attackType);
             if (tower.range == 0) continue;
             data.getTowers().add(tower);
         }
@@ -118,7 +130,36 @@ public class Listeners extends EventListener {
         Data data = Utils.getData(e.getPlayer());
         e.setFormat(Utils.color(data.getGroup().getPrefix() + " &f" + e.getPlayer().getName() + "&f : " + (data.getGroup().getGroup().toLowerCase().equals("joueur") ? "&8" : "&f") + message));
     }
-
+    
+    @EventHandler
+    public void onDrop(PlayerSwapHandItemsEvent e) {
+    	if (e.getPlayer().getGameMode() == GameMode.CREATIVE)return;
+    	e.setCancelled(false);
+    }
+    
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+    	if (e.getPlayer().getGameMode() == GameMode.CREATIVE)return;
+    	e.setCancelled(true);
+    }
+    
+    @EventHandler
+    public void onFall(EntityDamageEvent e) {
+    	if (e.getEntity() instanceof Player) {
+    		Player player = (Player) e.getEntity();
+    		if (e.getCause() == DamageCause.VOID) {
+    			e.setCancelled(true);
+    			Data data = super.dataFrom(player);
+    			Arena arena = data.getArena();
+    			if (arena == null) {
+    				super.resetPlayerToSpawn(player);
+    			}else {
+    				player.teleport(arena.tp);
+    			}
+    		}
+    	}
+    }
+    
     @EventHandler
     public void onSpawn(EntitySpawnEvent e) {
     	if (e.getEntity() instanceof Player)return;
@@ -126,17 +167,6 @@ public class Listeners extends EventListener {
     	if (!(e.getEntity() instanceof LivingEntity))return;
     	instance.getTowerManager().currentEnemies.add(e.getEntity());
     }
-    
-//    @EventHandler
-//    public void onPlay(PlayerWinEvent e) {
-//    	
-//    	Player player = e.getPlayer();
-//    	Data data = e.getData();
-//    	
-//    	data.po = 0;
-//    	super.resetPlayerToSpawn(player);
-//    	
-//    }
     
     @EventHandler
     public void onInteractEntity(PlayerInteractAtEntityEvent e) {
@@ -146,7 +176,12 @@ public class Listeners extends EventListener {
             menu.set(e.getPlayer());
         }
         if (e.getRightClicked() instanceof Cat) {
-        	dataFrom(player).towerMenu(player, true);
+        	dataFrom(player).towerMenu(player, 0);
+        }
+        if (e.getRightClicked() instanceof ArmorStand) {
+        	if (e.getRightClicked() == instance.getEvolutionManager().getArmorStand()) {
+        		new TowerMenu(1).set(player);
+        	}
         }
     }
 
@@ -169,7 +204,7 @@ public class Listeners extends EventListener {
     		return;
     		
 		case CHEST:
-            dataFrom(player).towerMenu(player, false);
+            dataFrom(player).towerMenu(player, -1);
             e.setCancelled(true);
 			return;
 		case RED_TERRACOTTA:
@@ -180,11 +215,22 @@ public class Listeners extends EventListener {
 				super.resetPlayerToSpawn(player);
 			}
 			return;
+		case COMPASS:
+			new TeleportationMenu().set(player);
+			return;
 		default:
 			break;
 		}
     }
 
+    @EventHandler
+    public void onDeathEntity(EntityDeathEvent e) {
+    	if (instance.getTowerManager().currentEnemies.contains(e.getEntity())) {
+    		e.setDroppedExp(0);
+    		e.getDrops().clear();
+    	}
+    }
+    
     @EventHandler
     public void onClickInventoryMenu(InventoryClickEvent e) {
         InventoryHolder holder = e.getInventory().getHolder();
@@ -196,7 +242,9 @@ public class Listeners extends EventListener {
 
             e.setCancelled(true);
             menu.HandleMenu(e);
+            return;
         }
-
+    	if (e.getWhoClicked().getGameMode() == GameMode.CREATIVE)return;
+    	e.setCancelled(true);
     }
 }

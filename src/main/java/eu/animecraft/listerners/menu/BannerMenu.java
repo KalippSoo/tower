@@ -18,7 +18,6 @@ public class BannerMenu extends Menu {
 
     public BannerMenu() {
     }
-
     public String name() {
         return "Current Units";
     }
@@ -31,21 +30,13 @@ public class BannerMenu extends Menu {
         Player player = (Player)e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         switch (item.getType()) {
-            case GLOWSTONE_DUST:
+        	case BARRIER:
+        		player.closeInventory();
+        		break;
+        	case GLOWSTONE_DUST:
                 player.closeInventory();
                 break;
             case LIME_DYE:
-
-                if (getData().getMaxStorageSize() < this.getData().getTowers().size() + item.getAmount()) {
-                    Utils.sendMessages(player, new String[]{"&cNot enough place in the storage"});
-                    return;
-                }
-
-                int price = 50 * item.getAmount();
-                if (this.getData().gems < price) {
-                    Utils.sendMessages(player, new String[]{"&cYou don't have enough gems !"});
-                    return;
-                }
             	
             	PlayerBannerDropEvent event = new PlayerBannerDropEvent(player, (item.getAmount()-1), 0);
             	if (!event.isCancelled()) {

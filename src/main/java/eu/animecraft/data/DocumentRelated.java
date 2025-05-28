@@ -21,6 +21,7 @@ public class DocumentRelated {
         int gold = 0;
         int experience = 0;
         int level = 1;
+        int playLevel = 0;
         int rerolls = 0;
         String title = "";
 
@@ -84,6 +85,7 @@ public class DocumentRelated {
             collection = getSpecificDocument(player, "collection");
             stats = getSpecificDocument(player, "stats");
 
+            playLevel = stats.getInteger("playlevel");
             gems = stats.getInteger("gems");
             gold = stats.getInteger("gold");
             level = stats.getInteger("level");
@@ -99,6 +101,7 @@ public class DocumentRelated {
         data.level = level;
         data.title = title;
         data.rerolls = rerolls;
+        data.setPlayLevel(playLevel);
 
         data.setListSelected(list);
         data.setMaxStorageSize(inventorySize);
@@ -121,6 +124,7 @@ public class DocumentRelated {
                 inventory = new Document()
                 ;
 
+        stats.append("playlevel", data.getPlayLevel());
         stats.append("level", data.level);
         stats.append("title", data.title);
         stats.append("gems", data.gems);

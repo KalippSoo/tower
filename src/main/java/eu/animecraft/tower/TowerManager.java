@@ -27,6 +27,7 @@ import eu.animecraft.tower.towers.TowerItochi;
 import eu.animecraft.tower.towers.TowerNami;
 import eu.animecraft.tower.towers.TowerNamiClimaStick;
 import eu.animecraft.tower.towers.TowerSonGoku;
+import eu.animecraft.tower.towers.TowerTamanegy;
 
 public class TowerManager {
     public List<Tower> availableTower = new ArrayList<>();
@@ -36,78 +37,31 @@ public class TowerManager {
     public Map<Player, List<TowerComponent>> activeTower = new HashMap<>();
 
     public TowerManager() {
-    	this.availableTower.add(new TowerItochi());
-        this.availableTower.add(new TowerSonGoku());
-        this.availableTower.add(new TowerIchigu());
-        //NAMI
-        this.availableTower.add(new TowerNami());
-        this.availableTower.add(new TowerNamiClimaStick());
-        //BOROS
-        this.availableTower.add(new TowerBorosArmored());
-        this.availableTower.add(new TowerBorosFree());
-        this.availableTower.add(new TowerBorosLightningBurst());
-        
-        for(int i = 0; i < 5; i++) {
-        	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
-            this.currentBanner.add(availableTower.get(random));
+    	
+//    	this.availableTower.add(new TowerItochi());
+//        this.availableTower.add(new TowerSonGoku());
+//        this.availableTower.add(new TowerIchigu());	
+//        //NAMI
+//        this.availableTower.add(new TowerNami());
+//        this.availableTower.add(new TowerNamiClimaStick());
+//        //BOROS
+//        this.availableTower.add(new TowerBorosArmored());
+//        this.availableTower.add(new TowerBorosFree());
+//        this.availableTower.add(new TowerBorosLightningBurst());
+//        
+//        this.availableTower.add(new TowerTamanegy());
+    	updateBanner();
+    }
+    
+    public void updateBanner() {
+        this.currentBanner.add(availableTower.get(8));
+        for(int i = 0; i < availableTower.size(); i++) {
+        	Tower tower = availableTower.get(i);
+        	if (tower.evo == null) {
+            	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
+                this.currentBanner.add(availableTower.get(random));
+        	}
         }
-        
-//        new BukkitRunnable() {
-//			@Override
-//			public void run() {
-//				for (Player players : activeTower.keySet()) {
-//					for (TowerComponent tcs : activeTower.get(players)) {
-//						List<Entity> removal = new ArrayList<>();
-//						circleInput(players, (int) tcs.tower.fr, tcs.towers.keySet());
-//						for (ArmorStand stands : tcs.towers.keySet()) {
-//							int tick = tcs.towers.get(stands);
-//							
-//							if (tick > 0) {
-//								tick--;
-//							}else {
-//								if (currentEnemies.isEmpty()) return;
-//								tick = (int) (tcs.tower.fc);
-//								Iterator<Entity> entities = currentEnemies.iterator();
-//								while (entities.hasNext()) {
-//									Entity entity = entities.next();
-//									LivingEntity target = ((LivingEntity)entity);
-//									double
-//									x1 = stands.getLocation().getX(),
-//									x2 = entity.getLocation().getX(),
-//									z1 = stands.getLocation().getZ(),
-//									z2 = entity.getLocation().getZ(),
-//									y1 = stands.getLocation().getY(),
-//									y2 = entity.getLocation().getY();
-//									
-//									double distance = calculateDistanceBetweenPoints(x1, z1, y1, x2, z2, y2);
-//									if (distance > tcs.tower.fr)continue;
-//									
-//									target.damage(tcs.tower.fd);
-//									if (target.isDead()) {
-//										removal.add(target);
-//									}
-//									
-//									Bukkit.getPluginManager().callEvent(new TowerHittingTargetEvent(tcs.tower, target));
-//									
-//								    Vector direction = stands.getLocation().toVector().subtract(target.getEyeLocation().toVector()).normalize();
-//								    double x = direction.getX();
-//								    double y = direction.getY();
-//								    double z = direction.getZ();
-//									
-//								    Location changed = stands.getLocation().clone();
-//								    changed.setYaw(180 - toDegree(Math.atan2(x, z)));
-//								    changed.setPitch(90 - toDegree(Math.acos(y)));
-//								    stands.teleport(changed);
-//									
-//								}
-//							}
-//							tcs.towers.put(stands, tick);
-//						}
-//					}
-//				}
-//			}
-//		}.runTaskTimer(AnimeCraft.instance, 0, 0);
-        
     }
     
     public static List<Location> generateSphere(Location centerBlock, int radius, boolean hollow) {

@@ -1,6 +1,7 @@
 package eu.animecraft.controler;
 
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
@@ -23,6 +24,8 @@ public class EnemyCustom extends EntityCreature{
 	private EntityTypes<? extends EntityCreature> entityTypes;
 	private boolean canBeStun, canBeSlow;
 	private Arena arena;
+	public PathfinderGoalTower pathfinderTower = null;
+	public boolean boss = false;
 	
 	public EnemyCustom(EntityTypes<? extends EntityCreature> entitytypes, double speed, double health, String name, Arena region, boolean canBeStun, boolean canBeSlow) {
 		super(entitytypes, ((CraftWorld)region.paths.get(0).getWorld()).getHandle());
@@ -33,6 +36,11 @@ public class EnemyCustom extends EntityCreature{
 		this.canBeStun = canBeStun;
 		this.canBeSlow = canBeSlow;
 		this.arena=region;
+		this.ai = true;
+		
+		if (entitytypes == EntityTypes.IRON_GOLEM) {
+			boss = true;
+		}
 		
 		Location l = region.paths.get(0);
 		
@@ -43,15 +51,17 @@ public class EnemyCustom extends EntityCreature{
 		this.collides = false;
 		
 		drops.clear();
-		this.getAttributeInstance(GenericAttributes.MAX_HEALTH).setValue(health);
+		int completeHealth = (int) (health+((health*arena.getBonusHealthAct()[arena.getAct()])/100));
+		this.getAttributeInstance(GenericAttributes.MAX_HEALTH).setValue(completeHealth);
 		this.getAttributeInstance(GenericAttributes.KNOCKBACK_RESISTANCE).setValue(100);
 		
 		this.setCustomNameVisible(true);
-		this.setHealth((float) health);
+		this.setHealth((float) completeHealth);
 		
 		//pathfinder
 		initPathfinder();
-		this.goalSelector.a(0, new PathfinderGoalTower(this, region, speed));
+		pathfinderTower = new PathfinderGoalTower(this, region, speed);
+		this.goalSelector.a(0, pathfinderTower);
 	}
 	
 	@Override
@@ -70,6 +80,9 @@ public class EnemyCustom extends EntityCreature{
 	public void tick() {
 		super.tick();
 		name();
+		if (boss) {
+			this.getBukkitEntity().getWorld().spawnParticle(Particle.LAVA, this.getBukkitEntity().getLocation().add(0,1.5,0), 1, 0, 0, 0, .1f);
+		}
 	}
 	
 	private void preSpawn(Arena region) {
@@ -77,7 +90,7 @@ public class EnemyCustom extends EntityCreature{
 		EnemyCustom custom = new EnemyCustom(entityTypes, speed, health, name, region, canBeStun, canBeSlow);
 		WorldServer world = ((CraftWorld)region.paths.get(0).getWorld()).getHandle();
 		world.addEntity(custom, SpawnReason.CUSTOM);
-		this.arena.enemies.add(custom.getBukkitEntity());
+		this.arena.enemies.put(custom.getBukkitEntity(), this);
 	}
 	
 	public void spawn() {

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class ManagerCommand extends ISCommands {
 
-    String commandSyntax = "/aa <give/remove/clear> <name>";
+    String commandSyntax = "/aa ";
 
     public ManagerCommand(AnimeCraft main) {
         super(main, "aa", "aa.admin");
@@ -21,6 +21,22 @@ public class ManagerCommand extends ISCommands {
         }
         if (args.length == 2){
             
+        	String input = args[0];
+        	
+        	switch (input) {
+			case "give":
+				
+				break;
+			case "remove":
+				
+				break;
+			case "clear":
+				
+				break;
+			default:
+				Utils.sendMessages(sender, "&cUnknow syntax, &f" + commandSyntax);
+				break;
+			}
         }
     }
 }

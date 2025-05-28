@@ -19,12 +19,13 @@ public class Data {
     private List<Tower> towers = new ArrayList<>();
     private List<String> listSelected = new ArrayList<>();
     private int maxStorageSize;
+    private int playLevel = 0;
     
     private Arena arena;
     public int po;
     
     //No need at first connect
-    private TowerMenu towerMenu = new TowerMenu(false);
+    private TowerMenu towerMenu = new TowerMenu(-1);
     public Play play = null;
     
     public int gems = 0;
@@ -93,9 +94,8 @@ public class Data {
     		return true;
     	}
     }
-    
-    public TowerMenu towerMenu(Player player, boolean mode) {
-    	towerMenu.rerollMenu = mode;
+    public TowerMenu towerMenu(Player player, int mode) {
+    	towerMenu.mode = mode;
     	towerMenu.set(player);
     	return towerMenu;
     }
@@ -165,5 +165,13 @@ public class Data {
 	}	
 	public void setArena(Arena arena) {
 		this.arena = arena;
+	}
+
+	public int getPlayLevel() {
+		return playLevel;
+	}
+
+	public void setPlayLevel(int playLevel) {
+		this.playLevel = playLevel;
 	}
 }

@@ -62,7 +62,7 @@ public class RerollMenu extends Menu {
                 			));
                 	break;
                 case BARRIER:
-                	getData().towerMenu(getPlayer(), true);
+                	getData().towerMenu(getPlayer(), 0);
                     break;
 			default:
 				break;

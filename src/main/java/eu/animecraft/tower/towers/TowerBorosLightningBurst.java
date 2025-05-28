@@ -14,7 +14,8 @@ public class TowerBorosLightningBurst extends Tower{
 				+ "g2ODkwNzRkOTQ3ZjBlOTlmNCIsCiAgInByb2ZpbGVOYW1lIiA6ICJjdWN1bWkwNyIsCiAgInNpZ25hdHVyZV"
 				+ "JlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOi"
 				+ "AiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8xM2ViNDVkYmJkYjYyMzYxYTQyNTdlZT"
-				+ "cwMjY5NWRmNTEwNWJhOTAxYjM2YWRhNmJjMTM1NzNjY2VlZWY0NTA3IgogICAgfQogIH0KfQ==", null);
+				+ "cwMjY5NWRmNTEwNWJhOTAxYjM2YWRhNmJjMTM1NzNjY2VlZWY0NTA3IgogICAgfQogIH0KfQ==", null
+				, AttackType.FULL);
 		this.damage = 1200;
         this.cooldown = 140;
         this.range = 40;

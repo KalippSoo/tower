@@ -37,6 +37,11 @@ public class ConfigManager {
 
     }
 
+    public boolean isEmpty(String string) {
+    	if (this.dataConfig.getConfigurationSection(string) != null && this.dataConfig.getConfigurationSection(string).getKeys(false).size() > 0) return false;
+    	return true;
+    }
+    
     public FileConfiguration getConfig() {
         if (this.dataConfig == null) {
             this.reloadConfig();

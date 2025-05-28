@@ -1,10 +1,10 @@
 package eu.animecraft.tower.towers;
 
+import java.util.UUID;
+
 import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.DamageType;
 import eu.animecraft.tower.tools.Rarity;
-
-import java.util.UUID;
 
 public class TowerIchigu extends Tower {
     public TowerIchigu() {
@@ -18,13 +18,10 @@ public class TowerIchigu extends Tower {
                         "iAgInByb2ZpbGVOYW1lIiA6ICJCZWR3YXJzQ3V0aWUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOi" +
                         "B7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2UwYWVhNGJ" +
                         "hZWM1ZmI0ZWVlNzZlY2RhYTJjOTNmZjkyYjU2YWQ3Nzg4M2Y3MjYyZjM4YzRlY2Q1ZjEzZDI5OSIsCiAgICAgICJtZXRhZGF0YSIgOiB7" +
-                        "CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9");
-        this.damage = 25;
-        this.cooldown = 100;
-        this.range = 6;
+                        "CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9", AttackType.SINGLE);
+        this.damage = 105;
+        this.cooldown = 80;
+        this.range = 8;
         this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.LIGHT};
-        
-        //this.upgrades.costs= new int[]{130,145,240,360,450,575,600};
-        //this.upgrades.upgrades= new String[]{"30_10_0", "20_40_0", "4_1_0", "4_8_5", "5_9_7", "87_4_5", "98_5_1"};
     }
 }

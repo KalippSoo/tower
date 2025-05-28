@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.CraftParticle;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_16_R3.PacketPlayOutUpdateAttributes;
 import net.minecraft.server.v1_16_R3.ParticleParam;
 
 public class NMSClass {
