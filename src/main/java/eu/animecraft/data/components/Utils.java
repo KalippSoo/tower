@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -37,12 +39,12 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
+import com.google.common.base.Objects;
 import com.google.gson.JsonParser;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
 import eu.animecraft.tower.Tower;
-import eu.animecraft.tower.towers.TowerBorosArmored;
 import eu.animecraft.tower.towers.TowerBorosFree;
 import eu.animecraft.tower.towers.TowerBorosLightningBurst;
 import eu.animecraft.tower.towers.TowerNamiClimaStick;
@@ -51,7 +53,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Utils {
     public static String moneySymbol = "❇";
     public static String creditSymbol = "Ⓒ";
-    public static World world = Bukkit.getWorld("world");
+    public static World overworld = Bukkit.getWorld("world");
     
     public static String format(double amount) {
     	
@@ -67,13 +69,21 @@ public class Utils {
     	
     }
     
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+    	for (Entry<T, E> entry : map.entrySet()) {
+    		if (Objects.equal(value, entry.getValue())) {
+    			return entry.getKey();
+    		}
+    	}
+		return null;
+    }
+    
     public static String color(String text) {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     public static Data getData(Player player){
         return AnimeCraft.instance.getDataManager().getPlayerData().get(player.getUniqueId());
-
     }
     
     public static ItemStack changeType(ItemStack item, Material type){
@@ -215,6 +225,12 @@ public class Utils {
         }
 
     }
+
+	public static void sendMessages(Player player, List<String> lines) {
+		for (String line : lines) {
+            player.sendMessage(color(check(player, line)));
+		}
+	}
     
     private static String check(Player player, String lines) {
     	

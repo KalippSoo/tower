@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class Menu implements InventoryHolder {
     private Player player;
@@ -29,11 +30,18 @@ public abstract class Menu implements InventoryHolder {
         this.player = player;
         this.instance = AnimeCraft.instance;
         this.data = this.instance.getDataManager().getPlayerData().get(player.getUniqueId());
-        this.inventory = Bukkit.createInventory(this, this.size(), this.name());
+        this.inventory = Bukkit.createInventory(this, this.size(), Utils.color(this.name()));
         this.setMenuItems();
         player.openInventory(this.inventory);
     }
 
+    public void add(int slot, ItemStack item) {
+    	inventory.setItem(slot, item);
+    }
+    public void add(ItemStack item) {
+    	inventory.addItem(item);
+    }
+    
     public Inventory getInventory() {
         return this.inventory;
     }

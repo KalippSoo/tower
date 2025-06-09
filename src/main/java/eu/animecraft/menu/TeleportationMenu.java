@@ -1,4 +1,4 @@
-package eu.animecraft.listerners.menu;
+package eu.animecraft.menu;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,8 +10,8 @@ import eu.animecraft.data.components.Utils;
 
 public class TeleportationMenu extends Menu{
 
-	public static Location play = new Location(Utils.world, -40.5, 104, -0.5, 90f, 0f);
-	public static Location summon = new Location(Utils.world, 0.5, 104, -36.5, 180f, -15f);
+	public static Location play = new Location(Utils.overworld, -40.5, 104, -0.5, 90f, 0f);
+	public static Location summon = new Location(Utils.overworld, 0.5, 104, -36.5, 180f, -15f);
 	
 	@Override
 	public String name() {

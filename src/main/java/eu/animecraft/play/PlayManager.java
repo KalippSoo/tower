@@ -2,8 +2,10 @@ package eu.animecraft.play;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,37 +16,35 @@ import eu.animecraft.arena.Arena;
 import eu.animecraft.arena.ArenaManager;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.DataManager;
+import eu.animecraft.data.components.ConfigManager;
 import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.play.PlayerJoinPlayEvent;
 import eu.animecraft.event.play.PlayerLeftPlayEvent;
 import eu.animecraft.event.play.PlayerTeleportPlayEvent;
-import eu.animecraft.listerners.menu.PlayMenu;
+import eu.animecraft.menu.PlayMenu;
 
 public class PlayManager extends EventListener{
 
-	public List<Play> currentRoom=new ArrayList<Play>();
 	public List<Playroom> rooms = new ArrayList<Playroom>();
 	
-	public PlayManager() {
-		currentRoom.add(new Play(new Location(Utils.world, -47.5, 104, -4.5), 0, 2));
-		currentRoom.add(new Play(new Location(Utils.world, -51.5, 104, -3.5), 0, 2));
-		currentRoom.add(new Play(new Location(Utils.world, -55.5, 104, -3.5), 0, 2));
+	public PlayManager(ConfigManager config) {
 		
-		currentRoom.add(new Play(new Location(Utils.world, -47.5, 104, 5.5), 0, -3));
-		currentRoom.add(new Play(new Location(Utils.world, -51.5, 104, 5.5), 0, -3));
-		currentRoom.add(new Play(new Location(Utils.world, -55.5, 104, 5.5), 0, -3));
-		
+		read(instance, config);
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
-				for (Play playRoom : currentRoom) {
-					if (playRoom.getPlayers().size() > 0) {
+				
+				for (Playroom playrooms : rooms) {
+					Play play = playrooms.getPlay();
+					if (!playrooms.isActive())continue;
+					
+					if (play.getPlayers().size() > 0) {
 						//At least one player is inside, so the cool down begin
-						playRoom.current--;
-						playRoom.getStand().setCustomName("Teleportation in "+playRoom.current+"... ("+playRoom.getPlayers().size()+"/"+playRoom.maxPlayers+")");
-						if (playRoom.current <= 0) {
+						play.current--;
+						playrooms.getStand().setCustomName("Teleportation in "+play.current+"... ("+play.getPlayers().size()+"/"+play.maxPlayers+")");
+						if (play.current <= 0) {
 							//Teleport to arena
 //							if (playRoom.getMode() == -1) {
 //								playRoom.getPlayers().forEach(players->resetPlayerToSpawn(players));
@@ -52,20 +52,49 @@ public class PlayManager extends EventListener{
 //								playRoom.setToWaiting();
 //								return;
 //							}
-							playRoom.getPlayers().forEach(players->{
-								callEvent(new PlayerTeleportPlayEvent(playRoom, ArenaManager.FindPlace(playRoom, playRoom.getMode(), playRoom.getActMode())));
+							play.getPlayers().forEach(players->{
+								callEvent(new PlayerTeleportPlayEvent(play, ArenaManager.FindPlace(play, play.getMode(), play.getActMode())));
 							});
 						}
 					}
 					
-					for (Entity entities:playRoom.getStand().getNearbyEntities(.5, .5, .5)) {
+					for (Entity entities:playrooms.getStand().getNearbyEntities(.5, .5, .5)) {
 						if (!(entities instanceof Player))continue;
 						Player player = (Player)entities;
-						callEvent(new PlayerJoinPlayEvent(playRoom, player));
+						callEvent(new PlayerJoinPlayEvent(playrooms, player));
 					}
 				}
 			}
 		}.runTaskTimer(AnimeCraft.instance, 0, 20);
+	}
+	
+	
+	public void read(AnimeCraft main, ConfigManager config) {
+		if (config.isEmpty("playrooms"))return;
+		FileConfiguration file = main.playrooms.getConfig();
+		for (String ids : file.getConfigurationSection("playrooms").getKeys(false)) {
+			
+			String path = "playrooms."+ids;
+			String[]
+			enter = file.getString(path+".enter").split(" "),
+			wait = file.getString(path+".wait").split(" ");
+			boolean active = file.getBoolean(path+".active");
+			
+			Location enterLocation = new Location(Utils.overworld, 
+					Double.parseDouble(enter[0]),
+					Double.parseDouble(enter[1]),
+					Double.parseDouble(enter[2]),
+					Float.parseFloat(enter[3]),
+					Float.parseFloat(enter[4]));
+			Location waitLocation = new Location(Utils.overworld,
+					Double.parseDouble(wait[0]),
+					Double.parseDouble(wait[1]),
+					Double.parseDouble(wait[2]),
+					Float.parseFloat(wait[3]),
+					Float.parseFloat(wait[4]));
+			rooms.add(new Playroom(ids, active, enterLocation, waitLocation));
+		}
+		
 	}
 	
 	@EventHandler
@@ -73,7 +102,8 @@ public class PlayManager extends EventListener{
 		
 		Player player = e.getPlayer();
 		Data data = e.getData();
-		Play play = e.getPlay();
+		Playroom playroom = e.getPlayroom();
+		Play play = playroom.getPlay();
 		
 		boolean hasTurrets = false;
 		for (String uuids : data.getListSelected()) {
@@ -103,7 +133,7 @@ public class PlayManager extends EventListener{
 		
 		play.getPlayers().add(player);
 		data.play = play;
-		player.teleport(play.getLocation());
+		player.teleport(playroom.getWait());
 		DataManager.changeInventory(player, 1);
 		
 		if (play.getOwner() == null) {
@@ -111,6 +141,7 @@ public class PlayManager extends EventListener{
 			new PlayMenu(play).set(player);
 		}
 	}
+	
 	@EventHandler
 	public void onPlayerLeftPlayEvent(PlayerLeftPlayEvent e) {
 		if (e.getPlay() == null)return;
@@ -119,6 +150,27 @@ public class PlayManager extends EventListener{
 			super.resetPlayerToSpawn(e.getPlayer());
 		}
 	}
+	
+	public Playroom getRoomById(String id) {
+		for (Playroom rooms : this.rooms) {
+			if (rooms.getId().equals(id)) {
+				return rooms;
+			}
+		}
+		return null;
+	}
+	
+	public String createNewRoom() {
+		int id = ThreadLocalRandom.current().nextInt(0, 1000);
+		for (Playroom rooms:this.rooms) {
+			if (rooms.getId().equals(id+"")) {
+				createNewRoom();
+				return null;
+			}
+		}
+		return id+"";
+	}
+	
 	@EventHandler
 	public void OnPlayerTeleportPlayEvent(PlayerTeleportPlayEvent e) {
 		Play play=e.getPlay();
@@ -136,6 +188,14 @@ public class PlayManager extends EventListener{
 		play.setToWaiting();
 	}
 	
+	public void OnDisable() {
+		
+		for (Playroom playroom:rooms) {
+			playroom.resetTitles();
+		}
+		
+	}
+
 	
 }
 

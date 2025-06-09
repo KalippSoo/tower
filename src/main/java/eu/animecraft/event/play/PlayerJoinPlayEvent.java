@@ -7,20 +7,20 @@ import org.bukkit.event.HandlerList;
 
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.Utils;
-import eu.animecraft.play.Play;
+import eu.animecraft.play.Playroom;
 
 public class PlayerJoinPlayEvent extends Event implements Cancellable{
 
 	private static HandlerList HANDLERS = new HandlerList();
 	
-	private Play play;
+	private Playroom playroom;
 	private Player player;
 	private Data data;
 	
 	boolean cancelled = false;
 	
-	public PlayerJoinPlayEvent(Play play, Player player) {
-		this.play=play;
+	public PlayerJoinPlayEvent(Playroom playroom, Player player) {
+		this.playroom=playroom;
 		this.player=player;
 		this.data=Utils.getData(player);
 	}
@@ -48,8 +48,8 @@ public class PlayerJoinPlayEvent extends Event implements Cancellable{
 		
 	}
 
-	public Play getPlay() {
-		return play;
+	public Playroom getPlayroom() {
+		return playroom;
 	}
 
 	public Player getPlayer() {

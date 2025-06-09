@@ -1,4 +1,4 @@
-package eu.animecraft.listerners;
+	package eu.animecraft.listeners;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -30,6 +31,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import eu.animecraft.AnimeCraft;
 import eu.animecraft.arena.Arena;
@@ -42,23 +44,40 @@ import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.play.PlayerLeftPlayEvent;
-import eu.animecraft.listerners.menu.BannerMenu;
-import eu.animecraft.listerners.menu.TeleportationMenu;
-import eu.animecraft.listerners.menu.TowerMenu;
+import eu.animecraft.menu.BannerMenu;
+import eu.animecraft.menu.TeleportationMenu;
+import eu.animecraft.menu.TowerMenu;
+import eu.animecraft.npc.NPCCommand;
+import eu.animecraft.npc.NoPlayerCharacter;
+import eu.animecraft.npc.PacketReader;
+import eu.animecraft.npc.event.PlayerAddLineToNPCEvent;
 import eu.animecraft.tower.Tower;
 import eu.animecraft.tower.tools.Trait;
 
 public class Listeners extends EventListener {
-
+	
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
+        
+    	PacketReader reader = new PacketReader();
+    	reader.inject(player);
+    	
         player.getInventory().clear();
         player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255, false, false));
         if (!AnimeCraft.instance.getDataManager().getPlayerData().containsKey(e.getPlayer().getUniqueId())) {
             AnimeCraft.instance.getDataManager().getPlayerData().put(e.getPlayer().getUniqueId(), new Data());
         }
 		
+        /*
+         * See if this is a new player
+         */
+        if (DocumentRelated.getPlayerDocument(player)==null) {
+        	e.setJoinMessage(Utils.color("&f&lWelcome &e&l" + e.getPlayer().getDisplayName()+"! to the server"));
+        }else {
+        	e.setJoinMessage(Utils.color("&e&l"+player.getDisplayName()+" &fjoined!"));
+        }
+        
 		Data data = Utils.getData(player);
         DocumentRelated.createGetDocument(player, data);
 
@@ -112,7 +131,7 @@ public class Listeners extends EventListener {
         
         data.setListSelected((DocumentRelated.getSpecificDocument(player, "menu").getList("selection", String.class)));
         DataManager.changeInventory(player, 0);
-	            
+	    
 		player.sendTitle(Utils.color("&fWelcome &e"+player.getName()), Utils.color("&cThis mode is still in beta !"), 5, 80, 5);
 		Utils.sendMessages(player, "&cPlease contact us, if there's something wrong !!");
 		super.resetPlayerToSpawn(player);
@@ -122,14 +141,39 @@ public class Listeners extends EventListener {
     public void onQuit(PlayerQuitEvent e) {
     	DocumentRelated.saveDocument(e.getPlayer());
         AnimeCraft.instance.getDataManager().getPlayerData().remove(e.getPlayer().getUniqueId(), Utils.getData(e.getPlayer()));
+    	PacketReader reader = new PacketReader();
+    	reader.uninject(e.getPlayer());
+    	e.setQuitMessage(Utils.color("&e&l"+e.getPlayer().getDisplayName()+" &fleft!"));
+    
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
         String message = e.getMessage();
+        Player player = e.getPlayer();
         Data data = Utils.getData(e.getPlayer());
+        
+        if (NPCCommand.addLineContainer.containsKey(player)) {
+        	if (message.startsWith("!stop")) {        		
+        		NPCCommand.addLineContainer.remove(player);
+        		Utils.sendMessages(player, "&7Done ! you can send back normal messages in the chat !");
+        		e.setCancelled(true);
+        		return;
+        	}
+        	NoPlayerCharacter npc = NPCCommand.addLineContainer.get(player);
+        	new BukkitRunnable() {
+				@Override
+				public void run() {
+				    Bukkit.getPluginManager().callEvent(new PlayerAddLineToNPCEvent(npc, player, message));
+				}
+			}.runTaskLater(instance, 1);
+        	e.setCancelled(true);
+        	return;
+        }
+        
         e.setFormat(Utils.color(data.getGroup().getPrefix() + " &f" + e.getPlayer().getName() + "&f : " + (data.getGroup().getGroup().toLowerCase().equals("joueur") ? "&8" : "&f") + message));
     }
+    
     
     @EventHandler
     public void onDrop(PlayerSwapHandItemsEvent e) {

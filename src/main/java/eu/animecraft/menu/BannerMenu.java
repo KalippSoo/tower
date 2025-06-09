@@ -1,6 +1,4 @@
-package eu.animecraft.listerners.menu;
-
-import java.util.concurrent.ThreadLocalRandom;
+package eu.animecraft.menu;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -8,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.components.Menu;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.banner.PlayerBannerDropEvent;
@@ -63,7 +60,7 @@ public class BannerMenu extends Menu {
         }
 
         for(i = 0; i < this.towerLocation.length; ++i) {
-            this.getInventory().setItem(this.towerLocation[i], AnimeCraft.instance.getTowerManager().availableTower.get(ThreadLocalRandom.current().nextInt(AnimeCraft.instance.getTowerManager().availableTower.size())).towerItem);
+            this.getInventory().setItem(this.towerLocation[i], instance.getTowerManager().currentBanner.get(i).towerItem);
         }
 
         this.getInventory().setItem(16, Utils.createItem(Material.LAPIS_LAZULI, 1, "&9Gems: &d" + this.instance.getDataManager().getPlayerData().get(this.getPlayer().getUniqueId()).gems));

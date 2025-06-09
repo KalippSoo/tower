@@ -1,6 +1,5 @@
 #
-# Mode changing the entire GAMEPLAY aspect
-# 0 = Lobby
-# 1 = GamePlay
 #
-mode: 0
+spawn:
+  world: world
+  location: 0 0 0 0 0

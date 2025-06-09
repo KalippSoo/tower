@@ -2,7 +2,7 @@ package eu.animecraft.data;
 
 import eu.animecraft.arena.Arena;
 import eu.animecraft.group.Group;
-import eu.animecraft.listerners.menu.TowerMenu;
+import eu.animecraft.menu.TowerMenu;
 import eu.animecraft.play.Play;
 import eu.animecraft.tower.Tower;
 

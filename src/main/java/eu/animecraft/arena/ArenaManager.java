@@ -22,7 +22,7 @@ import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.arena.ArenaNewWaveEvent;
 import eu.animecraft.event.arena.ArenaPreChargeEvent;
 import eu.animecraft.event.arena.ArenaWaveEndEvent;
-import eu.animecraft.listerners.menu.RewardsMenu;
+import eu.animecraft.menu.RewardsMenu;
 import eu.animecraft.play.Play;
 
 public class ArenaManager extends EventListener{

@@ -94,7 +94,6 @@ public class Tower extends Passive{
     	updateStats();
     	sound = SoundTower.getSound(id);
     	attackType = TowerAttack.getType(id);
-    	AnimeCraft.instance.getTowerManager().availableTower.add(this);
     }
     
     public Tower clone() {

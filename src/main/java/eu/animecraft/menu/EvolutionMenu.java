@@ -1,4 +1,4 @@
-package eu.animecraft.listerners.menu;
+package eu.animecraft.menu;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;

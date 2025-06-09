@@ -64,13 +64,6 @@ public abstract class Passive {
 		
 		private static List<LivingEntity> getSplash(Tower tower, Arena arena, List<LivingEntity> entities){
 			List<LivingEntity> closest = getClosest(tower, arena, entities);
-			
-			for (LivingEntity entity : entities) {
-				double distance = closest.get(0).getLocation().distance(entity.getLocation());
-				if (distance <= 5) {
-					closest.add(entity);
-				}
-			}
 			return closest;
 		}
 		

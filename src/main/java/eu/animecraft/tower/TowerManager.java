@@ -1,6 +1,8 @@
 package eu.animecraft.tower;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,60 +10,83 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.reflections.Reflections;
 
+import eu.animecraft.AnimeCraft;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.components.NMSClass;
 import eu.animecraft.data.components.TowerComponent;
 import eu.animecraft.data.components.Utils;
-import eu.animecraft.tower.towers.TowerBorosArmored;
-import eu.animecraft.tower.towers.TowerBorosFree;
-import eu.animecraft.tower.towers.TowerBorosLightningBurst;
-import eu.animecraft.tower.towers.TowerIchigu;
-import eu.animecraft.tower.towers.TowerItochi;
-import eu.animecraft.tower.towers.TowerNami;
-import eu.animecraft.tower.towers.TowerNamiClimaStick;
-import eu.animecraft.tower.towers.TowerSonGoku;
-import eu.animecraft.tower.towers.TowerTamanegy;
+import eu.animecraft.tower.tools.Rarity;
 
 public class TowerManager {
     public List<Tower> availableTower = new ArrayList<>();
     public List<Tower> currentBanner = new ArrayList<>();
     public List<Entity> currentEnemies = new ArrayList<>();
     
+    public Map<String, List<Tower>> towerByRarity = new HashMap<String, List<Tower>>();
     public Map<Player, List<TowerComponent>> activeTower = new HashMap<>();
 
     public TowerManager() {
     	
-//    	this.availableTower.add(new TowerItochi());
-//        this.availableTower.add(new TowerSonGoku());
-//        this.availableTower.add(new TowerIchigu());	
-//        //NAMI
-//        this.availableTower.add(new TowerNami());
-//        this.availableTower.add(new TowerNamiClimaStick());
-//        //BOROS
-//        this.availableTower.add(new TowerBorosArmored());
-//        this.availableTower.add(new TowerBorosFree());
-//        this.availableTower.add(new TowerBorosLightningBurst());
-//        
-//        this.availableTower.add(new TowerTamanegy());
+    	String path = getClass().getPackage().getName() + ".towers";
+    	
+    	for (Class<?> clazz : new Reflections(path).getSubTypesOf(Tower.class)) {
+    		
+    		try {
+    			List<Tower> towerList;
+				Tower tower = (Tower) clazz.getDeclaredConstructor().newInstance();
+				
+				String rarity = tower.getRarity().name();
+				if (towerByRarity.containsKey(rarity)) {
+					towerList = towerByRarity.get(rarity);
+				}else {
+					towerList = new ArrayList<Tower>();
+				}
+				towerList.add(tower);
+				towerByRarity.put(rarity, towerList);
+				this.availableTower.add(tower);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	new BukkitRunnable() {
+			int currentHours = 0;
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				Calendar cal = Calendar.getInstance();
+				cal.setTimeInMillis(System.currentTimeMillis());
+				if (currentHours != cal.getTime().getHours()) {
+					currentHours = cal.getTime().getHours();
+					Bukkit.getOnlinePlayers().forEach(players -> Utils.sendMessages(players, "&f&lThe banner has updated new units are now there!"));
+					updateBanner();
+				}
+
+			}
+		}.runTaskTimer(AnimeCraft.instance, 0, 600);
+    	
     	updateBanner();
     }
     
     public void updateBanner() {
-        this.currentBanner.add(availableTower.get(8));
-        for(int i = 0; i < availableTower.size(); i++) {
-        	Tower tower = availableTower.get(i);
-        	if (tower.evo == null) {
-            	int random = ThreadLocalRandom.current().nextInt(availableTower.size());
-                this.currentBanner.add(availableTower.get(random));
-        	}
-        }
+    	this.currentBanner.clear();
+    	this.currentBanner.add(towerByRarity.get("MYTHIC").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("MYTHIC").size())));
+    	this.currentBanner.add(towerByRarity.get("LEGENDARY").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("LEGENDARY").size())));
+    	this.currentBanner.add(towerByRarity.get("EPIC").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("EPIC").size())));
+    	this.currentBanner.add(towerByRarity.get("EPIC").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("EPIC").size())));
+    	this.currentBanner.add(towerByRarity.get("RARE").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("RARE").size())));
+    	this.currentBanner.add(towerByRarity.get("COMMON").get(ThreadLocalRandom.current().nextInt(towerByRarity.get("COMMON").size())));
     }
     
     public static List<Location> generateSphere(Location centerBlock, int radius, boolean hollow) {
@@ -119,15 +144,25 @@ public class TowerManager {
     		}
 
     public List<Tower> buyTower(int count) {
-    	List<Tower> towers = new ArrayList<>();
+    	List<Tower> towerList = new ArrayList<>();
         for (int i = 0; i<=count; i++) {
-            Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
+           //Tower tower = currentBanner.get(ThreadLocalRandom.current().nextInt(currentBanner.size())).clone();
+        	Tower tower = null;
+            double random = Math.random()*Rarity.getMaxChance(), previous = 0;
+            for (Tower towers:currentBanner) {
+                previous+=towers.getRarity().getDropChance();
+                if (random<=previous) {
+                	tower=towers.clone();
+                	break;
+                }
+            }
+            
             if (Math.random() * 101.0 <= 1.0) {
                 tower.setShiny(true);
             }
-            towers.add(tower);
+            towerList.add(tower);
         }
-        return towers;
+        return towerList;
     }
 
     public Tower getTower(int id) {

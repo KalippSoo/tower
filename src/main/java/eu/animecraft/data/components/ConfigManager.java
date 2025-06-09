@@ -14,22 +14,20 @@ public class ConfigManager {
     private FileConfiguration dataConfig = null;
     private File configFile = null;
     private String name;
-    public String type;
 
-    public ConfigManager(JavaPlugin main, String path, String name, String type) {
+    public ConfigManager(JavaPlugin main, String name) {
         this.main = main;
         this.name = name;
-        this.type = type;
         this.saveDefaultConfig();
     }
 
     public void reloadConfig() {
         if (this.configFile == null) {
-            this.configFile = new File(this.main.getDataFolder(), this.name + this.type);
+            this.configFile = new File(this.main.getDataFolder(), this.name);
         }
 
         this.dataConfig = YamlConfiguration.loadConfiguration(this.configFile);
-        InputStream defaultStream = this.main.getResource(this.name + this.type);
+        InputStream defaultStream = this.main.getResource(this.name);
         if (defaultStream != null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
             this.dataConfig.setDefaults(defaultConfig);
@@ -38,8 +36,13 @@ public class ConfigManager {
     }
 
     public boolean isEmpty(String string) {
-    	if (this.dataConfig.getConfigurationSection(string) != null && this.dataConfig.getConfigurationSection(string).getKeys(false).size() > 0) return false;
+    	if (getConfig().getConfigurationSection(string) != null && !getConfig().getConfigurationSection(string).getKeys(false).isEmpty()) return false;
     	return true;
+    }
+    
+    public void set(String path, Object object) {
+    	getConfig().set(path, object);
+    	this.saveConfig();
     }
     
     public FileConfiguration getConfig() {
@@ -63,17 +66,17 @@ public class ConfigManager {
 
     public void saveDefaultConfig() {
         if (this.configFile == null) {
-            this.configFile = new File(this.main.getDataFolder(), this.name + this.type);
+            this.configFile = new File(this.main.getDataFolder(), this.name);
         }
 
         if (!this.configFile.exists()) {
-            this.main.saveResource(this.name + this.type, false);
+            this.main.saveResource(this.name, false);
         }
 
     }
 
     public String getName() {
-        return this.name + this.type;
+        return this.name;
     }
 
     public File getFile() {

@@ -1,4 +1,4 @@
-package eu.animecraft.listerners.menu;
+package eu.animecraft.menu;
 
 import eu.animecraft.data.components.Menu;
 import org.bukkit.event.inventory.InventoryClickEvent;

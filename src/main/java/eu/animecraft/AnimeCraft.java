@@ -8,6 +8,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.reflections.Reflections;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -21,15 +22,18 @@ import com.mongodb.connection.ConnectionPoolSettings;
 import eu.animecraft.arena.ArenaManager;
 import eu.animecraft.automaticmessages.AutomaticMessages;
 import eu.animecraft.commands.DiscordCommand;
+import eu.animecraft.commands.PlayroomCommand;
+import eu.animecraft.commands.SetSpawnCommand;
 import eu.animecraft.data.Data;
 import eu.animecraft.data.DataManager;
 import eu.animecraft.data.components.ConfigManager;
+import eu.animecraft.data.components.EventListener;
 import eu.animecraft.data.components.Utils;
 import eu.animecraft.evolution.EvolutionManager;
 import eu.animecraft.group.GroupManager;
-import eu.animecraft.listerners.ArenaListener;
-import eu.animecraft.listerners.Listeners;
-import eu.animecraft.listerners.TowerListener;
+import eu.animecraft.npc.NPC;
+import eu.animecraft.npc.NPCCommand;
+import eu.animecraft.npc.hologram.HologramManager;
 import eu.animecraft.play.PlayManager;
 import eu.animecraft.tower.TowerManager;
 import net.md_5.bungee.api.ChatMessageType;
@@ -38,16 +42,20 @@ import net.minecraft.server.v1_16_R3.Item;
 import net.minecraft.server.v1_16_R3.Items;
 
 public class AnimeCraft extends JavaPlugin {
+	
     public static AnimeCraft instance;
+    
     private TowerManager towerManager;
     private DataManager dataManager;
     private GroupManager groupManager;
     private ArenaManager arenaManager;
     private EvolutionManager evolutionManager;
     private PlayManager playManager;
+    private HologramManager hologramManager;
+    
     public ConfigManager groups;
     public ConfigManager playrooms;
-    public static int mode = 0;
+    public ConfigManager npc_config;
 
     static MongoDatabase mongoDatabase;
 
@@ -62,16 +70,19 @@ public class AnimeCraft extends JavaPlugin {
         this.saveDefaultConfig();
         
         //YML CONFIGURATION
-        this.groups = new ConfigManager(this, "", "", "groups.yml");
-        this.playrooms = new ConfigManager(this, "", "", "playrooms.yml");
+        this.groups = new ConfigManager(this, "groups.yml");
+        this.playrooms = new ConfigManager(this, "playrooms.yml");
+        this.npc_config = new ConfigManager(this, "npc-config.yml");
         
-        //EVENT
+        //MANAGER
+        this.dataManager = new DataManager();
         this.towerManager = new TowerManager();
         this.groupManager = new GroupManager(this);
-        this.dataManager = new DataManager();
         this.arenaManager = new ArenaManager();
-        this.playManager = new PlayManager();
+        this.playManager = new PlayManager(playrooms);
         this.evolutionManager = new EvolutionManager();
+        this.hologramManager = new HologramManager();
+		NPC.loadNPCs(npc_config);
         listeners();
 
         try {
@@ -102,10 +113,25 @@ public class AnimeCraft extends JavaPlugin {
 
     }
 
+    @Override
+    public void onDisable() {
+    	this.playManager.OnDisable();
+    }
+    
     private void listeners() {
-        Bukkit.getServer().getPluginManager().registerEvents(new Listeners(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new TowerListener(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new ArenaListener(), this);
+    	
+    	Reflections reflections = new Reflections(getClass().getPackage().getName() + ".listeners");
+    	
+    	for (Class<?> clazz : reflections.getSubTypesOf(EventListener.class)) {
+    		try {
+    			EventListener listener = (EventListener) clazz
+						.getDeclaredConstructor()
+						.newInstance();
+				getServer().getPluginManager().registerEvents(listener, this);
+			} catch (Exception e) {
+			}
+    	}
+        
         Bukkit.getServer().getPluginManager().registerEvents(playManager, this);
         Bukkit.getServer().getPluginManager().registerEvents(arenaManager, this);
         
@@ -113,7 +139,11 @@ public class AnimeCraft extends JavaPlugin {
 	}
 
 	private void commands() {
+		
 		new DiscordCommand(this);
+		new NPCCommand(instance);
+		new PlayroomCommand(this);
+		new SetSpawnCommand(instance);
 	}
 
 	private void setBaseOptions() {
@@ -132,7 +162,6 @@ public class AnimeCraft extends JavaPlugin {
 		
     	Bukkit.getWorld("world").setPVP(false);
     	Bukkit.getWorld("world").setDifficulty(Difficulty.NORMAL);
-        mode = this.getConfig().getInt("mode");
         
         // ICI
 		AutomaticMessages.auto();
@@ -164,6 +193,8 @@ public class AnimeCraft extends JavaPlugin {
 	        profiles = mongoDatabase.getCollection("profiles");
 	}
 
+	
+	
 	public TowerManager getTowerManager() {
         return this.towerManager;
     }
@@ -186,6 +217,10 @@ public class AnimeCraft extends JavaPlugin {
 
 	public EvolutionManager getEvolutionManager() {
 		return evolutionManager;
+	}
+
+	public HologramManager getHologramManager() {
+		return hologramManager;
 	}
 	
 }

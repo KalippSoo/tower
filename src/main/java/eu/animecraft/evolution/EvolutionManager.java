@@ -14,11 +14,11 @@ import eu.animecraft.data.components.Utils;
 public class EvolutionManager {
 
 	private final ArmorStand armorStand;
-	private Location loc = new Location(Utils.world, 42.5, 105, 0.5);
+	private Location loc = new Location(Utils.overworld, 42.5, 105, 0.5);
 	
 	public EvolutionManager() {
 		
-		armorStand = Utils.world.spawn(loc, ArmorStand.class,
+		armorStand = Utils.overworld.spawn(loc, ArmorStand.class,
 				stand -> {
 					stand.setGravity(false);
 					stand.setInvisible(true);

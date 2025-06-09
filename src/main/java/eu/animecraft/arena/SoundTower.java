@@ -12,6 +12,7 @@ public class SoundTower {
 		case 1: sound = Sound.ENTITY_GENERIC_EXPLODE; break;
 		case 2: sound = Sound.ENTITY_PLAYER_ATTACK_SWEEP; break;
 		case 4575: sound = Sound.AMBIENT_UNDERWATER_LOOP; break;
+		
 		}
 		if (sound == null)
 			sound = Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR;

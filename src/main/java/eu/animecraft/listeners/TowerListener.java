@@ -1,4 +1,4 @@
-package eu.animecraft.listerners;
+package eu.animecraft.listeners;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import eu.animecraft.data.components.Utils;
 import eu.animecraft.event.banner.PlayerBannerDropEvent;
 import eu.animecraft.event.tower.TowerHittingTargetEvent;
 import eu.animecraft.event.tower.TowerPlaceEvent;
-import eu.animecraft.listerners.menu.BuyBannerMenu;
+import eu.animecraft.menu.BuyBannerMenu;
 import eu.animecraft.tower.Passive.AttackType;
 import eu.animecraft.tower.Tower;
 
@@ -107,7 +107,7 @@ public class TowerListener extends EventListener{
         }
         
         List<Tower> towers = instance.getTowerManager().buyTower(e.getCount());
-        for (Tower tower : towers) {
+        for (Tower tower:towers) {
             tower.newStats();
             tower.setOwner(player);
             data.getTowers().add(tower);

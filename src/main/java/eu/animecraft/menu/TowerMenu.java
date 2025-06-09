@@ -1,4 +1,4 @@
-package eu.animecraft.listerners.menu;
+package eu.animecraft.menu;
 
 import java.util.ArrayList;
 import java.util.List;

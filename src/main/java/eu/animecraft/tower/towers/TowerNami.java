@@ -28,7 +28,6 @@ public class TowerNami extends Tower{
         this.cooldown = 240;
         this.range = 15;
         this.damageTypes = new DamageType[]{DamageType.PHYSICAL, DamageType.WIND};
-        this.evo = new TowerNamiClimaStick();
 	}
 
 }

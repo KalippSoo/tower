@@ -1,4 +1,4 @@
-package eu.animecraft.listerners;
+package eu.animecraft.listeners;
 
 import org.bukkit.event.EventHandler;
 
